@@ -94,7 +94,6 @@ export default function App() {
   const [progressLog, setProgressLog] = useState([]);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
-  const [modalInfo, setModalInfo] = useState(null); // For interactive info popups
 
   const workspaceRef = useRef(null);
   const pricingRef = useRef(null);
@@ -148,7 +147,10 @@ export default function App() {
 
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
-      const parsedData = JSON.parse(responseText);
+      
+      // Bulletproof cleanup for markdown formatting blocks
+      const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+      const parsedData = JSON.parse(cleanedText);
 
       setResults(parsedData);
       setAgentPhase('idle');
