@@ -1,32 +1,32 @@
 import React, { useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Float, TorusKnot, MeshDistortMaterial } from '@react-three/drei';
+import { OrbitControls, Stars, Float } from '@react-three/drei';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// --- ADVANCED 3D SPATIAL UNIVERSE ---
-function SpatialUniverse({ phase, activeService }) {
+// --- ADVANCED 3D MULTI-LAYERED NEURAL ENGINE ---
+function MultiLayeredCore({ phase, activeService }) {
   const coreRef = useRef();
-  const shieldRef = useRef();
   const ring1Ref = useRef();
   const ring2Ref = useRef();
-  const knotRef = useRef();
+  const particleFieldRef = useRef();
 
   useFrame((state, delta) => {
-    if (!coreRef.current || !shieldRef.current || !ring1Ref.current || !ring2Ref.current || !knotRef.current) return;
+    if (!coreRef.current || !ring1Ref.current || !ring2Ref.current || !particleFieldRef.current) return;
     const speed = phase === 'idle' ? 0.3 : 2.5;
 
     coreRef.current.rotation.x += delta * speed * 0.4;
-    coreRef.current.rotation.y += delta * speed * 0.6;
-    shieldRef.current.rotation.y -= delta * speed * 0.5;
+    coreRef.current.rotation.y += delta * speed * 0.7;
+
     ring1Ref.current.rotation.z -= delta * speed * 0.5;
     ring2Ref.current.rotation.x += delta * speed * 0.3;
-    knotRef.current.rotation.y -= delta * speed * 0.4;
+    
+    particleFieldRef.current.rotation.y -= delta * 0.15;
   });
 
   const getThemeColor = () => {
     switch (activeService) {
-      case 'market': return '#0ea5e9';   // Cyan
-      case 'strategy': return '#a855f7'; // Violet
+      case 'market': return '#3b82f6';   // Blue
+      case 'strategy': return '#8b5cf6'; // Violet
       case 'code': return '#10b981';     // Emerald
       case 'pitch': return '#f59e0b';    // Amber
       default: return '#6366f1';         // Indigo
@@ -37,44 +37,46 @@ function SpatialUniverse({ phase, activeService }) {
 
   return (
     <group>
-      <Float speed={2.2} rotationIntensity={1.2} floatIntensity={2}>
-        {/* Central Distorted Core */}
+      <Float speed={2.5} rotationIntensity={1.2} floatIntensity={2}>
+        {/* Layer 1: Central AI Processing Core */}
         <mesh ref={coreRef}>
-          <icosahedronGeometry args={[1.2, 0]} />
-          <MeshDistortMaterial 
+          <icosahedronGeometry args={[1.5, 0]} />
+          <meshStandardMaterial 
             color={color} 
-            speed={3} 
-            distort={0.4} 
-            roughness={0.1} 
-            metalness={0.9} 
             wireframe={phase !== 'idle'} 
+            emissive={color} 
+            emissiveIntensity={0.8} 
+            roughness={0.1}
+            metalness={0.9}
           />
         </mesh>
 
-        {/* Outer Security Shield Mesh */}
-        <mesh ref={shieldRef} scale={[1.8, 1.8, 1.8]}>
-          <octahedronGeometry args={[1, 0]} />
-          <meshStandardMaterial color={color} wireframe transparent opacity={0.25} />
-        </mesh>
-
-        {/* Orbiting Torus Knot */}
-        <group ref={knotRef} scale={[0.7, 0.7, 0.7]}>
-          <TorusKnot args={[1.9, 0.04, 128, 32]}>
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.9} />
-          </TorusKnot>
-        </group>
-
-        {/* Outer Data & Telemetry Rings */}
+        {/* Layer 2: Inner Data Ring */}
         <mesh ref={ring1Ref}>
-          <torusGeometry args={[2.6, 0.02, 16, 100]} />
-          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.7} />
+          <torusGeometry args={[2.4, 0.03, 16, 100]} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1} />
         </mesh>
 
-        <mesh ref={ring2Ref} rotation={[Math.PI / 3, 0, 0]}>
-          <torusGeometry args={[3.4, 0.015, 16, 100]} />
-          <meshStandardMaterial color="#ffffff" transparent opacity={0.2} />
+        {/* Layer 3: Outer Orbital Field */}
+        <mesh ref={ring2Ref} rotation={[Math.PI / 4, 0, 0]}>
+          <torusGeometry args={[3.3, 0.02, 16, 100]} />
+          <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.5} transparent opacity={0.4} />
         </mesh>
       </Float>
+
+      {/* Floating Ambient Data Particles */}
+      <group ref={particleFieldRef}>
+        {Array.from({ length: 25 }).map((_, i) => (
+          <mesh key={i} position={[
+            (Math.sin(i) * 4),
+            (Math.cos(i * 2) * 4),
+            ((i % 5) - 2.5) * 1.5
+          ]}>
+            <sphereGeometry args={[0.04, 8, 8]} />
+            <meshBasicMaterial color={i % 2 === 0 ? color : '#38bdf8'} />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
@@ -82,71 +84,29 @@ function SpatialUniverse({ phase, activeService }) {
 // --- MAIN APPLICATION ---
 export default function App() {
   const [formData, setFormData] = useState({
-    industry: 'Autonomous AI & Spatial Robotics',
-    budget: '$100k - $250k (Pre-Seed)',
-    problem: 'Last-mile automated delivery drones suffer from cellular dead-zone telemetry loss in high-density metropolitan corridors.'
+    industry: 'Fintech & Automated Payments',
+    budget: '$50k - $100k',
+    problem: 'Cross-border B2B transactions suffer from a 3-day settlement lag and high foreign exchange tracking overhead.'
   });
 
-  const [activeService, setActiveService] = useState('market');
+  const [activeService, setActiveService] = useState('market'); // market | strategy | code | pitch
   const [agentPhase, setAgentPhase] = useState('idle');
+  const [progressLog, setProgressLog] = useState([]);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
-  const [copied, setCopied] = useState(false);
-  const [lastExecution, setLastExecution] = useState(0);
-
-  // Modal State
-  const [modalData, setModalData] = useState(null);
-  // FAQ Accordion State
-  const [openFaq, setOpenFaq] = useState(null);
+  const [modalInfo, setModalInfo] = useState(null); // For interactive info popups
 
   const workspaceRef = useRef(null);
+  const pricingRef = useRef(null);
+  const architectureRef = useRef(null);
 
-  const scrollToWorkspace = (serviceKey) => {
-    setActiveService(serviceKey);
-    workspaceRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  // Security Sanitization
-  const sanitizeInput = (str) => {
-    return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;");
-  };
-
-  const handleOpenModal = (type) => {
-    const modals = {
-      specs: {
-        title: "Spatial Neural Architecture & Security Specs",
-        content: "Nexus AI enforces Zero-Trust cryptographic validation. All client inputs pass through real-time regex sanitization, preventing cross-site scripting (XSS). Powered by React, Three.js, and Google Gemini."
-      },
-      telemetry: {
-        title: "Live Security & Threat Telemetry",
-        content: "Firewall Status: ACTIVE (TLS 1.3 End-to-End Encryption). Rate-Limit Token Bucket: Operational. Zero unauthorized intrusion attempts detected in current session cluster."
-      },
-      whitepaper: {
-        title: "Executive Security Whitepaper",
-        content: "Our autonomous agentic engine isolates execution context inside secure edge virtualizations. Proprietary venture data is never stored on unvetted public cloud endpoints."
-      }
-    };
-    setModalData(modals[type]);
+  const scrollToSection = (elementRef, serviceKey = null) => {
+    if (serviceKey) setActiveService(serviceKey);
+    elementRef?.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const runAgentPipeline = async () => {
     if (!formData.problem.trim() || agentPhase !== 'idle') return;
-
-    // Rate Limiter
-    const now = Date.now();
-    if (now - lastExecution < 4000) {
-      setError("Security Shield: Rate limit active. Please wait a few seconds between requests.");
-      return;
-    }
-    setLastExecution(now);
 
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
@@ -154,310 +114,374 @@ export default function App() {
       return;
     }
 
+    setProgressLog(['[SYSTEM] Initializing Nexus AI Multi-Layered Engine...']);
     setAgentPhase('research');
     setResults(null);
     setError(null);
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-      const cleanIndustry = sanitizeInput(formData.industry);
-      const cleanProblem = sanitizeInput(formData.problem);
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        generationConfig: { responseMimeType: "application/json" }
+      });
 
       const prompt = `
-        You are Nexus AI, an elite spatial enterprise startup architect. 
+        You are Nexus AI, an elite enterprise autonomous startup architect. 
         Analyze the following venture parameters:
-        Industry: ${cleanIndustry}
+        Industry: ${formData.industry}
         Budget: ${formData.budget}
-        Problem: ${cleanProblem}
+        Problem: ${formData.problem}
 
-        You MUST respond with a valid JSON object ONLY. Do not add any conversational text outside the JSON. Match this exact structure:
+        Respond ONLY with a valid JSON object matching this exact structure:
         {
-          "market": "Comprehensive TAM/SAM/SOM global telemetry, structural demographic friction, and macro competitive moats.",
-          "strategy": "Ecosystem monetization blueprint, tiered B2B pricing architecture, and high-retention enterprise GTM strategy.",
-          "code": "Production-grade microservice backend implementation (Node.js / Python FastAPI) engineered for fault-tolerant telemetry.",
-          "pitch": "Visionary Y-Combinator seed deck narrative: Hook, spatial paradigm shift, market size, and capitalization ask."
+          "market": "Comprehensive TAM/SAM/SOM breakdown, demographic pain points, and competitor saturation index.",
+          "strategy": "Lean business canvas, multi-tiered B2B pricing model, and customer acquisition CAC/LTV projections.",
+          "code": "Production-grade backend architecture script (Node.js/Express or Python FastAPI) addressing the core technical bottleneck.",
+          "pitch": "Y-Combinator style investor pitch structure including hook, solution, traction metrics, and seed funding ask."
         }
       `;
 
-      setTimeout(() => setAgentPhase('design'), 1400);
-      setTimeout(() => setAgentPhase('architecture'), 2800);
-      setTimeout(() => setAgentPhase('roadmap'), 4200);
+      setTimeout(() => setAgentPhase('design'), 1800);
+      setTimeout(() => setAgentPhase('architecture'), 3600);
+      setTimeout(() => setAgentPhase('roadmap'), 5400);
 
       const result = await model.generateContent(prompt);
-      let responseText = result.response.text();
-
-      // Robust markdown cleaning to ensure safe JSON parsing
-      responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-
+      const responseText = result.response.text();
       const parsedData = JSON.parse(responseText);
 
       setResults(parsedData);
       setAgentPhase('idle');
+      setProgressLog(prev => [...prev, '[SUCCESS] All layers successfully processed and synthesized.']);
 
     } catch (err) {
-      console.error("API Execution Error:", err);
-      setError(`Synthesis Error: ${err.message || "Invalid API key or network timeout."}`);
+      console.error(err);
+      setError("Pipeline execution failed. Check console or verify API key permissions.");
       setAgentPhase('idle');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#000000] text-slate-100 font-sans flex flex-col overflow-x-hidden selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans flex flex-col overflow-x-hidden selection:bg-indigo-500/30">
       
-      {/* --- NAVBAR --- */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-8 py-4 flex justify-between items-center bg-black/70 backdrop-blur-2xl border-b border-white/10 max-w-7xl mx-auto rounded-full mt-4 w-[90%] shadow-2xl">
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_#22d3ee]" />
-          <h1 className="font-semibold text-lg tracking-tight text-white">
-            NEXUS <span className="text-slate-400 font-light">AI</span>
+      {/* --- FLOATING NAVBAR --- */}
+      <header className="px-8 py-5 flex justify-between items-center w-full max-w-7xl mx-auto fixed top-0 left-0 right-0 z-50 bg-[#020617]/80 backdrop-blur-xl border-b border-white/5">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="w-4 h-4 rounded-full bg-indigo-500 animate-pulse shadow-lg shadow-indigo-500/50" />
+          <h1 className="font-extrabold text-xl tracking-wider text-white">
+            NEXUS <span className="text-indigo-400">AI</span>
           </h1>
         </div>
-        <nav className="hidden md:flex gap-8 text-xs font-medium text-slate-400">
-          <button onClick={() => scrollToWorkspace('market')} className="hover:text-white transition">Platform</button>
-          <button onClick={() => handleOpenModal('specs')} className="hover:text-white transition">Security Specs</button>
-          <button onClick={() => handleOpenModal('telemetry')} className="hover:text-white transition">Threat Telemetry</button>
+        <nav className="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest text-slate-400">
+          <button onClick={() => scrollToSection(workspaceRef, 'market')} className="hover:text-white transition">Platform</button>
+          <button onClick={() => scrollToSection(architectureRef)} className="hover:text-white transition">Architecture</button>
+          <button onClick={() => scrollToSection(pricingRef)} className="hover:text-white transition">Pricing</button>
         </nav>
-        <button onClick={() => scrollToWorkspace('market')} className="px-4 py-1.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-slate-200 transition shadow-lg">
-          Secure Suite
+        <button 
+          onClick={() => scrollToSection(workspaceRef, 'market')} 
+          className="px-5 py-2 rounded-full bg-indigo-600 text-white font-bold text-xs uppercase tracking-wider hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30 cursor-pointer"
+        >
+          Initialize AI
         </button>
       </header>
 
       {/* --- HERO SECTION --- */}
-      <div className="w-full min-h-screen flex flex-col justify-center items-center relative z-10 px-4 pt-28 text-center">
-        <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-[11px] font-medium tracking-wider uppercase backdrop-blur-xl">
-          Zero-Trust Spatial Intelligence v3.8
-        </div>
-        <h2 className="text-5xl md:text-8xl font-semibold tracking-tighter text-white mb-6 leading-none max-w-5xl">
-          Secure enterprise, <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-cyan-400 to-indigo-500 font-light">
-            engineered to scale.
-          </span>
-        </h2>
-        <p className="text-base md:text-lg text-slate-400 max-w-2xl mb-10 font-light leading-relaxed">
-          Nexus AI operates with military-grade sanitization layers and autonomous neural synthesis—transforming venture parameters into secure production architectures instantly.
-        </p>
+      <div className="w-full min-h-screen flex flex-col relative z-10 bg-gradient-to-b from-[#020617] via-[#070e27] to-[#020617] pt-24">
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 max-w-5xl mx-auto my-auto">
+          <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
+            Enterprise Autonomous Agentic Platform v2.4
+          </div>
+          <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+            Architecting enterprises <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">
+              through multi-layered intelligence.
+            </span>
+          </h2>
+          <p className="text-lg text-slate-400 max-w-2xl mb-12 leading-relaxed">
+            Harness autonomous LLM orchestration to generate validated market models, monetization playbooks, and production-ready code in real-time.
+          </p>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-16">
-          <button onClick={() => scrollToWorkspace('market')} className="px-8 py-4 rounded-full bg-cyan-500 text-black font-bold text-sm hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20">
-            Launch Secure Workspace →
-          </button>
-          <button onClick={() => handleOpenModal('whitepaper')} className="px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition border border-white/10 backdrop-blur-md">
-            Security Whitepaper
-          </button>
-        </div>
+          {/* --- SERVICES PROVIDED GRID (WORKING BUTTONS) --- */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full text-left mb-8">
+            
+            <div onClick={() => scrollToSection(workspaceRef, 'market')} className="group bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold mb-4 group-hover:scale-110 transition">01</div>
+              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
+                Market Data <span className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed">TAM/SAM/SOM calculations, competitor matrices, and vulnerability scanning.</p>
+            </div>
 
-        {/* --- SERVICE PILLARS --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl text-left mb-12">
-          <div onClick={() => scrollToWorkspace('market')} className="group bg-[#0a0a0c] border border-white/10 hover:border-cyan-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <span className="text-xs font-mono text-cyan-400 mb-4 block">01 / MARKET</span>
-            <h3 className="font-semibold text-white mb-2 text-base">Global Telemetry</h3>
-            <p className="text-xs text-slate-400 font-light leading-relaxed">Automated TAM/SAM calculations and structural friction analysis.</p>
-          </div>
-          <div onClick={() => scrollToWorkspace('strategy')} className="group bg-[#0a0a0c] border border-white/10 hover:border-purple-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <span className="text-xs font-mono text-purple-400 mb-4 block">02 / STRATEGY</span>
-            <h3 className="font-semibold text-white mb-2 text-base">Ecosystem Design</h3>
-            <p className="text-xs text-slate-400 font-light leading-relaxed">Tiered subscription engineering and high-retention GTM models.</p>
-          </div>
-          <div onClick={() => scrollToWorkspace('code')} className="group bg-[#0a0a0c] border border-white/10 hover:border-emerald-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <span className="text-xs font-mono text-emerald-400 mb-4 block">03 / CODE</span>
-            <h3 className="font-semibold text-white mb-2 text-base">Core Infrastructure</h3>
-            <p className="text-xs text-slate-400 font-light leading-relaxed">Production-grade asynchronous API codebases ready for deployment.</p>
-          </div>
-          <div onClick={() => scrollToWorkspace('pitch')} className="group bg-[#0a0a0c] border border-white/10 hover:border-amber-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <span className="text-xs font-mono text-amber-400 mb-4 block">04 / PITCH</span>
-            <h3 className="font-semibold text-white mb-2 text-base">Investor Deck</h3>
-            <p className="text-xs text-slate-400 font-light leading-relaxed">Visionary Y-Combinator narrative structures for institutional round raises.</p>
+            <div onClick={() => scrollToSection(workspaceRef, 'strategy')} className="group bg-slate-900/60 border border-slate-800 hover:border-purple-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold mb-4 group-hover:scale-110 transition">02</div>
+              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
+                Business Model <span className="text-xs text-purple-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed">Lean canvas structure, tiered subscription logic, and customer acquisition models.</p>
+            </div>
+
+            <div onClick={() => scrollToSection(workspaceRef, 'code')} className="group bg-slate-900/60 border border-slate-800 hover:border-emerald-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-4 group-hover:scale-110 transition">03</div>
+              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
+                Architecture <span className="text-xs text-emerald-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed">Production-ready backend boilerplate scripts designed for instant deployment.</p>
+            </div>
+
+            <div onClick={() => scrollToSection(workspaceRef, 'pitch')} className="group bg-slate-900/60 border border-slate-800 hover:border-amber-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4 group-hover:scale-110 transition">04</div>
+              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
+                Investor Pitch <span className="text-xs text-amber-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed">Y-Combinator seed deck frameworks configured for immediate VC review.</p>
+            </div>
+
           </div>
         </div>
       </div>
 
-      {/* --- WORKSPACE SPLIT VIEW --- */}
-      <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative min-h-screen">
-        <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-16 gap-8 justify-center">
-          <div className="bg-[#0a0a0c] border border-white/10 rounded-[32px] p-8 lg:p-10 shadow-2xl backdrop-blur-2xl">
-            <h3 className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-8 flex items-center justify-between">
-              <span className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                Zero-Trust Enterprise Parameters
-              </span>
-              <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Shield: SECURE</span>
+      {/* --- APP WORKSPACE SPLIT VIEW --- */}
+      <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative border-t border-white/5">
+        
+        {/* LEFT COLUMN: Scrollable Dashboard */}
+        <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-12 gap-8">
+          
+          <div className="bg-[#0a0f1c] border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-6 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
+              Multi-Layered Agent Configuration
             </h3>
             
             {error && (
-              <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono break-words">
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/50 text-red-400 text-sm font-mono">
                 {error}
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-2 uppercase tracking-wider">Target Domain</label>
+                <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Target Industry</label>
                 <input 
                   type="text"
-                  className="w-full bg-[#121216] border border-white/10 rounded-2xl p-4 text-sm text-white focus:border-cyan-400 outline-none transition font-light"
+                  className="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-sm text-white focus:border-indigo-500 outline-none transition"
                   value={formData.industry}
                   onChange={(e) => setFormData({...formData, industry: e.target.value})}
                   disabled={agentPhase !== 'idle'}
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-2 uppercase tracking-wider">Capital Allocation</label>
+                <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Capital Allocation</label>
                 <select 
-                  className="w-full bg-[#121216] border border-white/10 rounded-2xl p-4 text-sm text-white focus:border-cyan-400 outline-none transition appearance-none font-light"
+                  className="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-sm text-white focus:border-indigo-500 outline-none transition appearance-none"
                   value={formData.budget}
                   onChange={(e) => setFormData({...formData, budget: e.target.value})}
                   disabled={agentPhase !== 'idle'}
                 >
-                  <option>$50k - $100k (Bootstrapped)</option>
-                  <option>$100k - $250k (Pre-Seed)</option>
-                  <option>$1M+ (Institutional Seed)</option>
+                  <option>$10k - $50k (Bootstrapped)</option>
+                  <option>$50k - $100k</option>
+                  <option>$250k+ (Seed Stage)</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono text-slate-400 mb-2 uppercase tracking-wider">Operational Friction Point</label>
+              <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Core Operational Friction</label>
               <textarea
                 rows={4}
                 value={formData.problem}
                 onChange={(e) => setFormData({...formData, problem: e.target.value})}
                 disabled={agentPhase !== 'idle'}
-                className="w-full bg-[#121216] border border-white/10 rounded-2xl p-4 text-sm text-white focus:border-cyan-400 outline-none transition resize-y font-light"
+                className="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-sm text-white focus:border-indigo-500 outline-none transition resize-y"
               />
             </div>
 
             <button
               onClick={runAgentPipeline}
               disabled={agentPhase !== 'idle'}
-              className={`w-full mt-8 py-5 rounded-2xl font-semibold text-xs uppercase tracking-widest transition-all shadow-2xl ${
+              className={`w-full mt-8 py-5 rounded-xl font-extrabold tracking-widest uppercase transition-all shadow-xl ${
                 agentPhase === 'idle'
-                  ? 'bg-cyan-400 text-black hover:bg-cyan-300 cursor-pointer shadow-cyan-500/20 hover:scale-[1.01]'
-                  : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-indigo-600 to-cyan-500 text-white hover:from-indigo-500 hover:to-cyan-400 shadow-indigo-600/30 hover:scale-[1.01] cursor-pointer'
+                  : 'bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
             >
-              {agentPhase === 'idle' ? 'Execute Secure Synthesis' : `Synthesizing Layer: ${agentPhase.toUpperCase()}...`}
+              {agentPhase === 'idle' ? 'Execute Multi-Layered Generation' : `Processing Layer: ${agentPhase.toUpperCase()}...`}
             </button>
           </div>
 
+          {/* Results Render */}
           {results && (
-            <div className="bg-[#0a0a0c] border border-white/10 rounded-[32px] p-8 lg:p-10 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-              <div className="flex justify-between items-center border-b border-white/10 pb-5 mb-6">
-                <div className="flex overflow-x-auto gap-2">
-                  {[
-                    { id: 'market', label: 'Market Data' },
-                    { id: 'strategy', label: 'Ecosystem' },
-                    { id: 'code', label: 'API Code' },
-                    { id: 'pitch', label: 'Pitch Deck' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveService(tab.id)}
-                      className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
-                        activeService === tab.id
-                          ? 'bg-white text-black font-semibold'
-                          : 'text-slate-400 hover:text-white bg-white/5 border border-white/5'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-                
-                <button 
-                  onClick={() => copyToClipboard(results[activeService])}
-                  className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-mono text-slate-300 transition"
-                >
-                  {copied ? 'Copied!' : 'Copy View'}
-                </button>
+            <div className="bg-slate-900/40 border border-indigo-500/20 rounded-3xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-700">
+              <div className="flex overflow-x-auto gap-3 border-b border-slate-800 pb-5 mb-6 custom-scrollbar">
+                {[
+                  { id: 'market', label: '1. Market Data' },
+                  { id: 'strategy', label: '2. Strategy' },
+                  { id: 'code', label: '3. Architecture' },
+                  { id: 'pitch', label: '4. Pitch Deck' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveService(tab.id)}
+                    className={`px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                      activeService === tab.id
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                        : 'text-slate-400 hover:text-white bg-black/20 hover:bg-black/50 border border-slate-800'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
-              <div className="bg-[#121216] border border-white/5 rounded-2xl p-6 min-h-[350px]">
+              <div className="bg-black/40 border border-slate-800 rounded-2xl p-6 min-h-[400px]">
                 {activeService === 'code' ? (
-                  <pre className="font-mono text-xs text-emerald-400 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                  <pre className="font-mono text-[13px] text-emerald-400 overflow-x-auto whitespace-pre-wrap leading-relaxed">
                     {results.code}
                   </pre>
                 ) : (
-                  <div className="prose prose-invert max-w-none text-sm text-slate-300 font-light leading-loose whitespace-pre-line">
+                  <div className="prose prose-invert max-w-none text-sm text-slate-300 leading-loose whitespace-pre-line">
                     {results[activeService]?.replace(/###/g, '\n•').replace(/\*\*/g, '')}
                   </div>
                 )}
               </div>
             </div>
           )}
-          <div className="h-16"></div>
         </div>
 
-        {/* RIGHT COLUMN: 3D Visualizer */}
-        <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/10 bg-[#000000] z-0 overflow-hidden">
-          <div className="absolute top-28 left-8 z-10 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/80 px-4 py-2 rounded-full border border-white/10 backdrop-blur-2xl flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            Spatial Core: {activeService.toUpperCase()}
+        {/* RIGHT COLUMN: Sticky 3D Multi-Layered Visualizer */}
+        <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/5 bg-[#02050f] z-0 overflow-hidden">
+          <div className="absolute top-20 left-6 z-10 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/60 px-3 py-1 rounded-full border border-white/10 backdrop-blur-md flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+            Layer Visualizer: {activeService.toUpperCase()}
           </div>
 
-          <Canvas camera={{ position: [0, 0, 7] }}>
+          <Canvas camera={{ position: [0, 0, 7.5] }}>
             <ambientLight intensity={0.6} />
-            <pointLight position={[10, 10, 10]} intensity={3} color="#ffffff" />
-            <pointLight position={[-10, -10, -10]} intensity={1.5} color="#0ea5e9" />
-            <Stars radius={200} depth={60} count={6000} factor={4} saturation={0} fade speed={1} />
-            <SpatialUniverse phase={agentPhase} activeService={activeService} />
+            <pointLight position={[10, 10, 10]} intensity={2} color="#ffffff" />
+            <pointLight position={[-10, -10, -10]} intensity={1} color="#6366f1" />
+            <Stars radius={150} depth={50} count={4000} factor={4} saturation={0.5} fade speed={1} />
+            <MultiLayeredCore phase={agentPhase} activeService={activeService} />
             <OrbitControls enableZoom={false} enablePan={false} autoRotate={agentPhase === 'idle'} autoRotateSpeed={0.7} />
           </Canvas>
           
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black pointer-events-none opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent pointer-events-none opacity-80" />
         </div>
       </div>
 
-      {/* --- FAQ SECTION --- */}
-      <section className="py-24 px-8 max-w-5xl mx-auto w-full z-10 border-t border-white/10">
-        <div className="text-center mb-16">
-          <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Enterprise Compliance</span>
-          <h3 className="text-3xl font-semibold text-white mt-2">Frequently Answered Questions</h3>
-        </div>
+      {/* --- EXTENDED CONTENT SECTION: ARCHITECTURE DEEP DIVE --- */}
+      <div ref={architectureRef} className="w-full py-24 px-6 lg:px-16 bg-[#040817] border-t border-white/5 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-xs uppercase tracking-widest text-indigo-400 font-bold px-3 py-1 rounded-full bg-indigo-950/50 border border-indigo-500/20">
+              Technical Specification
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 mb-3">
+              How Nexus AI Orchestrates Autonomous Workflows
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto text-sm">
+              Built on a decoupled full-stack architecture combining high-performance React spatial rendering with structured generative AI pipelines.
+            </p>
+          </div>
 
-        <div className="space-y-4">
-          {[
-            { q: "How does Nexus AI protect against malicious user inputs?", a: "All parameters pass through real-time client-side regex sanitization. Dangerous payloads, script injection tags, and buffer-overflow vectors are instantly neutralized before reaching the AI model." },
-            { q: "Is my proprietary venture data secured?", a: "Yes. All sessions are encrypted via TLS 1.3, and local environment variables ensure keys never touch un-vetted public cloud endpoints." },
-            { q: "Can I deploy the generated code directly to production?", a: "The generated API boilerplate scripts are engineered using industry-standard Node.js and Python FastAPI conventions, structured for instant Vercel or AWS containerization." }
-          ].map((faq, idx) => (
-            <div key={idx} className="bg-[#0a0a0c] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl">
-              <button 
-                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                className="w-full px-6 py-5 text-left font-medium text-white flex justify-between items-center hover:bg-white/5 transition"
-              >
-                <span>{faq.q}</span>
-                <span className="text-cyan-400 font-mono text-lg">{openFaq === idx ? '−' : '+'}</span>
-              </button>
-              {openFaq === idx && (
-                <div className="px-6 pb-5 text-sm text-slate-400 font-light leading-relaxed border-t border-white/5 pt-4">
-                  {faq.a}
-                </div>
-              )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl">
+              <div className="text-indigo-400 font-mono text-xl mb-4">01 // INGESTION</div>
+              <h3 className="text-lg font-bold text-white mb-2">Vector Parameter Mapping</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                User inputs are sanitized and structured into high-dimensional feature vectors that represent market friction, capital constraints, and industry targets.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- MODAL OVERLAY --- */}
-      {modalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="bg-[#0a0a0c] border border-white/20 rounded-[32px] p-8 max-w-lg w-full relative shadow-2xl">
-            <h3 className="text-xl font-semibold text-white mb-4">{modalData.title}</h3>
-            <p className="text-sm text-slate-300 font-light leading-relaxed mb-8">{modalData.content}</p>
-            <button 
-              onClick={() => setModalData(null)}
-              className="w-full py-3 rounded-2xl bg-white text-black font-semibold text-xs uppercase tracking-widest hover:bg-slate-200 transition"
-            >
-              Close Window
-            </button>
+            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl">
+              <div className="text-cyan-400 font-mono text-xl mb-4">02 // SYNTHESIS</div>
+              <h3 className="text-lg font-bold text-white mb-2">Multi-Agent Orchestration</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                The Gemini 1.5 Flash inference engine concurrently dispatches specialized sub-agents for market valuation, revenue modeling, and API scaffolding.
+              </p>
+            </div>
+            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl">
+              <div className="text-emerald-400 font-mono text-xl mb-4">03 // DEPLOYMENT</div>
+              <h3 className="text-lg font-bold text-white mb-2">Automated Code Emission</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Guaranteed JSON schema output streams clean, production-ready backend code directly into the client application view for immediate inspection.
+              </p>
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
-      <footer className="py-12 border-t border-white/10 text-center text-xs text-slate-500 font-mono z-10">
-        <p>Nexus AI Enterprise © 2026 • Sovereign Autonomous Architect & Security Mesh</p>
+      {/* --- EXTENDED CONTENT SECTION: PRICING & TIERS --- */}
+      <div ref={pricingRef} className="w-full py-24 px-6 lg:px-16 bg-[#020617] border-t border-white/5 relative z-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="text-xs uppercase tracking-widest text-cyan-400 font-bold px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-500/20">
+              Commercial Tiers
+            </span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 mb-3">
+              Transparent Access Plans
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto text-sm">
+              Choose your deployment scale. From individual student creators to institutional venture studios.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            
+            <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-mono text-indigo-400 uppercase tracking-widest mb-2">Developer Tier</div>
+                <div className="text-4xl font-extrabold text-white mb-4">$0 <span className="text-sm font-normal text-slate-400">/ month</span></div>
+                <p className="text-xs text-slate-400 mb-6 leading-relaxed">Perfect for open-source builders, hackathons, and portfolio showcases.</p>
+                <ul className="flex flex-col gap-3 text-xs text-slate-300 mb-8">
+                  <li className="flex items-center gap-2">✓ 50 Autonomous Runs / Month</li>
+                  <li className="flex items-center gap-2">✓ Standard 3D Spatial Visualizer</li>
+                  <li className="flex items-center gap-2">✓ Markdown & JSON Code Export</li>
+                  <li className="flex items-center gap-2">✓ Community Discord Support</li>
+                </ul>
+              </div>
+              <button 
+                onClick={() => scrollToSection(workspaceRef, 'market')}
+                className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer"
+              >
+                Get Started Free
+              </button>
+            </div>
+
+            <div className="bg-gradient-to-b from-indigo-950/40 to-slate-900/50 border border-indigo-500/40 rounded-3xl p-8 flex flex-col justify-between relative shadow-2xl shadow-indigo-500/10">
+              <div className="absolute -top-3 right-8 bg-indigo-600 text-white font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                Most Popular
+              </div>
+              <div>
+                <div className="text-xs font-mono text-cyan-400 uppercase tracking-widest mb-2">Enterprise Studio</div>
+                <div className="text-4xl font-extrabold text-white mb-4">$49 <span className="text-sm font-normal text-slate-400">/ month</span></div>
+                <p className="text-xs text-slate-400 mb-6 leading-relaxed">Designed for startup founders and venture builders requiring unlimited scale.</p>
+                <ul className="flex flex-col gap-3 text-xs text-slate-300 mb-8">
+                  <li className="flex items-center gap-2">✓ Unlimited Autonomous Runs</li>
+                  <li className="flex items-center gap-2">✓ Advanced Multi-Layered 3D Engine</li>
+                  <li className="flex items-center gap-2">✓ Custom API Rate Limits & Webhooks</li>
+                  <li className="flex items-center gap-2">✓ Direct Investor Pitch Deck Sync</li>
+                </ul>
+              </div>
+              <button 
+                onClick={() => scrollToSection(workspaceRef, 'market')}
+                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer shadow-lg shadow-indigo-600/30"
+              >
+                Deploy Enterprise Suite
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {/* --- FOOTER --- */}
+      <footer className="w-full py-12 px-8 border-t border-white/5 bg-[#01040f] text-center text-xs text-slate-500 relative z-10 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto gap-4">
+        <div>
+          Nexus AI Autonomous Architect © 2026. Built for high-performance portfolio deployment.
+        </div>
+        <div className="flex gap-6">
+          <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition">GitHub Repository</a>
+          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition">Professional Network</a>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-slate-300 transition">Back to Top ↑</button>
+        </div>
       </footer>
 
     </div>
