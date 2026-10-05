@@ -123,7 +123,7 @@ export default function App() {
     const modals = {
       specs: {
         title: "Spatial Neural Architecture & Security Specs",
-        content: "Nexus AI enforces Zero-Trust cryptographic validation. All client inputs pass through real-time regex sanitization, preventing cross-site scripting (XSS). Powered by React, Three.js, and Google Gemini 1.5 Flash."
+        content: "Nexus AI enforces Zero-Trust cryptographic validation. All client inputs pass through real-time regex sanitization, preventing cross-site scripting (XSS). Powered by React, Three.js, and Google Gemini."
       },
       telemetry: {
         title: "Live Security & Threat Telemetry",
@@ -160,7 +160,7 @@ export default function App() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Using the verified, stable gemini-1.5-flash model endpoint
+      // Using the standard universal model identifier
       const model = genAI.getGenerativeModel({ 
         model: "gemini-1.5-flash",
         generationConfig: { responseMimeType: "application/json" }
@@ -227,7 +227,7 @@ export default function App() {
       {/* --- HERO SECTION --- */}
       <div className="w-full min-h-screen flex flex-col justify-center items-center relative z-10 px-4 pt-28 text-center">
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-[11px] font-medium tracking-wider uppercase backdrop-blur-xl">
-          Zero-Trust Spatial Intelligence v3.5
+          Zero-Trust Spatial Intelligence v3.6
         </div>
         <h2 className="text-5xl md:text-8xl font-semibold tracking-tighter text-white mb-6 leading-none max-w-5xl">
           Secure enterprise, <br />
