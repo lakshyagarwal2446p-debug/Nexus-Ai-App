@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Float, TorusKnot, MeshDistortMaterial } from '@react-three/drei';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// --- ADVANCED 3D SPATIAL & SECURITY UNIVERSE ---
+// --- ADVANCED 3D SPATIAL UNIVERSE ---
 function SpatialUniverse({ phase, activeService }) {
   const coreRef = useRef();
   const shieldRef = useRef();
@@ -37,18 +37,11 @@ function SpatialUniverse({ phase, activeService }) {
 
   return (
     <group>
-      <Float speed={2.2} rotationIntensity={1.2} floatIntensity={2}>
+      <Float floatIntensity="{2}" rotationIntensity="{1.2}" speed="{2.2}">
         {/* Central Distorted Core */}
         <mesh ref={coreRef}>
           <icosahedronGeometry args={[1.2, 0]} />
-          <MeshDistortMaterial 
-            color={color} 
-            speed={3} 
-            distort={0.4} 
-            roughness={0.1} 
-            metalness={0.9} 
-            wireframe={phase !== 'idle'} 
-          />
+          <MeshDistortMaterial !="=" 'idle'} color="{color}" distort="{0.4}" metalness="{0.9}" roughness="{0.1}" speed="{3}" wireframe="{phase"/>
         </mesh>
 
         {/* Outer Security Shield Mesh */}
@@ -59,7 +52,7 @@ function SpatialUniverse({ phase, activeService }) {
 
         {/* Orbiting Torus Knot */}
         <group ref={knotRef} scale={[0.7, 0.7, 0.7]}>
-          <TorusKnot args={[1.9, 0.04, 128, 32]}>
+          <TorusKnot 0.04, 128, 32]} args="{[1.9,">
             <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.9} />
           </TorusKnot>
         </group>
@@ -160,11 +153,8 @@ export default function App() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Using the standard universal model identifier
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        generationConfig: { responseMimeType: "application/json" }
-      });
+      // Clean model initialization compatible with all API key tiers
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const cleanIndustry = sanitizeInput(formData.industry);
       const cleanProblem = sanitizeInput(formData.problem);
@@ -176,7 +166,7 @@ export default function App() {
         Budget: ${formData.budget}
         Problem: ${cleanProblem}
 
-        Respond ONLY with a valid JSON object matching this exact structure:
+        You MUST respond with a valid JSON object ONLY. Do not add any conversational text outside the JSON. Match this exact structure:
         {
           "market": "Comprehensive TAM/SAM/SOM global telemetry, structural demographic friction, and macro competitive moats.",
           "strategy": "Ecosystem monetization blueprint, tiered B2B pricing architecture, and high-retention enterprise GTM strategy.",
@@ -190,7 +180,11 @@ export default function App() {
       setTimeout(() => setAgentPhase('roadmap'), 4200);
 
       const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      let responseText = result.response.text();
+
+      // Robust markdown cleaning to ensure safe JSON parsing
+      responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
       const parsedData = JSON.parse(responseText);
 
       setResults(parsedData);
@@ -227,7 +221,7 @@ export default function App() {
       {/* --- HERO SECTION --- */}
       <div className="w-full min-h-screen flex flex-col justify-center items-center relative z-10 px-4 pt-28 text-center">
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-[11px] font-medium tracking-wider uppercase backdrop-blur-xl">
-          Zero-Trust Spatial Intelligence v3.6
+          Zero-Trust Spatial Intelligence v3.7
         </div>
         <h2 className="text-5xl md:text-8xl font-semibold tracking-tighter text-white mb-6 leading-none max-w-5xl">
           Secure enterprise, <br />
