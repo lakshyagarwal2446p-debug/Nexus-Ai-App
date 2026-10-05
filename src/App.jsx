@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Float } from '@react-three/drei';
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -46,14 +46,7 @@ function EnterpriseSpatialCore({ activeService }) {
       <Float speed={2.5} rotationIntensity={1.5} floatIntensity={2}>
         <mesh ref={coreRef}>
           <dodecahedronGeometry args={[1.3, 0]} />
-          <meshStandardMaterial 
-            color={themeColor} 
-            wireframe={activeService !== 'all'} 
-            emissive={themeColor}
-            emissiveIntensity={0.8}
-            roughness={0.1}
-            metalness={0.9}
-          />
+          <meshStandardMaterial color={themeColor} wireframe={activeService !== 'all'} emissive={themeColor} emissiveIntensity={0.8} roughness={0.1} metalness={0.9} />
         </mesh>
         <mesh ref={ring1Ref}>
           <torusGeometry args={[2.0, 0.025, 16, 100]} />
@@ -81,7 +74,7 @@ export default function App() {
   const [selectedService, setSelectedService] = useState('all');
   const [selectedTier, setSelectedTier] = useState('Free');
   const [checkoutModal, setCheckoutModal] = useState(null);
-  const [paymentGateway, setPaymentGateway] = useState(null); // New state for mock checkout
+  const [paymentGateway, setPaymentGateway] = useState(null); 
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -119,32 +112,30 @@ export default function App() {
     { name: 'Enterprise', price: '$899', desc: 'For institutional execution and VC syndicates.', features: ['Dedicated Agent Clusters', 'Custom Legal & Tax Modules', '24/7 Dedicated Architect', 'White-Label Reports'] }
   ];
 
-  // Handler for triggering the right modal
   const handleSubscriptionClick = (plan) => {
-    setSelectedTier(plan.name);
     if (plan.name === 'Free') {
+      setSelectedTier('Free');
       setCheckoutModal({
         title: 'Free Tier Activated!',
-        message: 'Your account has been granted standard access to 3 monthly pipeline executions. Launch your workspace below!'
+        message: 'Your account has been switched to the Free Tier. Launch your workspace below!'
       });
     } else {
-      // Open our mock payment gateway instead of an external link
       setPaymentGateway(plan);
     }
   };
 
-  // Mock Payment Processor
   const processMockPayment = (e) => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate network delay for realism
     setTimeout(() => {
       setIsProcessing(false);
+      setSelectedTier(paymentGateway.name);
+      const planName = paymentGateway.name;
       setPaymentGateway(null);
       setCheckoutModal({
         title: 'Payment Successful!',
-        message: `Your payment of ${paymentGateway.price} for the ${paymentGateway.name} tier was processed successfully via Nexus Secure Gateway. Welcome aboard!`
+        message: `Your payment was processed successfully via Nexus Secure Gateway. Welcome to the ${planName} tier!`
       });
     }, 2000);
   };
@@ -204,18 +195,8 @@ export default function App() {
             <h3 className="text-xl font-bold text-white mb-3">{checkoutModal.title}</h3>
             <p className="text-slate-300 text-sm leading-relaxed mb-8">{checkoutModal.message}</p>
             <div className="flex gap-3">
-              <button 
-                onClick={() => setCheckoutModal(null)}
-                className="flex-1 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition"
-              >
-                Close
-              </button>
-              <button 
-                onClick={() => { setCheckoutModal(null); scrollToWorkspace(); }}
-                className="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-indigo-500/20"
-              >
-                Launch Workspace
-              </button>
+              <button onClick={() => setCheckoutModal(null)} className="flex-1 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition">Close</button>
+              <button onClick={() => { setCheckoutModal(null); scrollToWorkspace(); }} className="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-indigo-500/20">Launch Workspace</button>
             </div>
           </div>
         </div>
@@ -225,9 +206,7 @@ export default function App() {
       {paymentGateway && (
         <div className="fixed inset-0 z-[55] flex items-center justify-center p-4 bg-black/90 backdrop-blur-lg animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="bg-[#0f172a] border border-slate-700 rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
-            {/* Top design accent */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-cyan-500 to-emerald-500"></div>
-            
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-lg font-bold text-white">Secure Checkout</h3>
@@ -267,19 +246,8 @@ export default function App() {
                 </div>
               </div>
               
-              <button 
-                type="submit"
-                disabled={isProcessing}
-                className="w-full mt-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-600/30 flex justify-center items-center gap-2"
-              >
-                {isProcessing ? (
-                  <>
-                    <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                    Processing...
-                  </>
-                ) : (
-                  `Pay ${paymentGateway.price}`
-                )}
+              <button type="submit" disabled={isProcessing} className="w-full mt-6 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-600/30 flex justify-center items-center gap-2">
+                {isProcessing ? <><span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>Processing...</> : `Pay ${paymentGateway.price}`}
               </button>
             </form>
             <div className="text-center mt-4 text-[10px] text-slate-500 flex items-center justify-center gap-1">
@@ -453,7 +421,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* --- PRICING & MOCK GATEWAY SECTION --- */}
+      {/* --- PRICING SECTION WITH SMART BUTTONS --- */}
       <section id="pricing" className="py-24 px-8 max-w-7xl mx-auto w-full">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Transparent Subscriptions</h3>
@@ -477,8 +445,15 @@ export default function App() {
                   ))}
                 </ul>
               </div>
-              <button onClick={() => handleSubscriptionClick(plan)} className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-lg ${selectedTier === plan.name ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/25' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}>
-                {plan.name === 'Free' ? 'Activate Free Tier' : `Checkout (${plan.price})`}
+              <button 
+                onClick={() => selectedTier !== plan.name && handleSubscriptionClick(plan)} 
+                className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-lg ${
+                  selectedTier === plan.name
+                    ? 'bg-indigo-600/50 text-slate-300 cursor-default'
+                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/25'
+                }`}
+              >
+                {selectedTier === plan.name ? 'Current Plan' : `Checkout (${plan.price})`}
               </button>
             </div>
           ))}
