@@ -3,23 +3,25 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Float } from '@react-three/drei';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// --- ADVANCED MULTI-LAYERED 3D SCENE ---
-function LayeredAgentCore({ activeService }) {
+// --- ADVANCED MULTI-NODE 3D SPATIAL VIZ ---
+function EnterpriseSpatialCore({ activeService }) {
   const coreRef = useRef();
   const ring1Ref = useRef();
   const ring2Ref = useRef();
   const ring3Ref = useRef();
+  const ring4Ref = useRef();
 
   useFrame((state, delta) => {
-    if (!coreRef.current || !ring1Ref.current || !ring2Ref.current || !ring3Ref.current) return;
+    if (!coreRef.current || !ring1Ref.current || !ring2Ref.current || !ring3Ref.current || !ring4Ref.current) return;
     
-    const speed = activeService === 'all' ? 1.0 : 2.8;
+    const speed = activeService === 'all' ? 0.8 : 2.2;
     coreRef.current.rotation.x += delta * speed * 0.4;
-    coreRef.current.rotation.y += delta * speed * 0.7;
+    coreRef.current.rotation.y += delta * speed * 0.6;
     
-    ring1Ref.current.rotation.z -= delta * speed * 0.5;
-    ring2Ref.current.rotation.x += delta * speed * 0.3;
-    ring3Ref.current.rotation.y -= delta * speed * 0.6;
+    ring1Ref.current.rotation.z -= delta * speed * 0.4;
+    ring2Ref.current.rotation.x += delta * speed * 0.5;
+    ring3Ref.current.rotation.y -= delta * speed * 0.3;
+    ring4Ref.current.rotation.z += delta * speed * 0.7;
   });
 
   const getThemeColor = () => {
@@ -31,6 +33,8 @@ function LayeredAgentCore({ activeService }) {
       case 'neural': return '#a855f7';   // Purple
       case 'tax': return '#06b6d4';      // Cyan
       case 'vc': return '#ec4899';       // Pink
+      case 'quantum': return '#eab308';  // Yellow
+      case 'cyber': return '#14b8a6';    // Teal
       default: return '#6366f1';         // Indigo
     }
   };
@@ -39,46 +43,52 @@ function LayeredAgentCore({ activeService }) {
 
   return (
     <group>
-      <Float speed={3} rotationIntensity={2} floatIntensity={2.5}>
-        {/* Layer 1: Central Core Node */}
+      <Float speed={2.5} rotationIntensity={1.5} floatIntensity={2}>
+        {/* Core Node */}
         <mesh ref={coreRef}>
-          <icosahedronGeometry args={[1.5, 0]} />
+          <dodecahedronGeometry args={[1.3, 0]} />
           <meshStandardMaterial 
             color={themeColor} 
             wireframe={activeService !== 'all'} 
             emissive={themeColor}
-            emissiveIntensity={0.7}
+            emissiveIntensity={0.8}
             roughness={0.1}
             metalness={0.9}
           />
         </mesh>
 
-        {/* Layer 2: Inner Ring */}
+        {/* Ring 1 */}
         <mesh ref={ring1Ref}>
-          <torusGeometry args={[2.3, 0.03, 16, 100]} />
-          <meshStandardMaterial color={themeColor} emissive={themeColor} emissiveIntensity={0.8} />
+          <torusGeometry args={[2.0, 0.025, 16, 100]} />
+          <meshStandardMaterial color={themeColor} emissive={themeColor} emissiveIntensity={0.6} />
         </mesh>
 
-        {/* Layer 3: Orbital Ring */}
-        <mesh ref={ring2Ref} rotation={[Math.PI / 3, 0, 0]}>
-          <torusGeometry args={[3.0, 0.02, 16, 100]} />
-          <meshStandardMaterial color="#ffffff" transparent opacity={0.4} />
+        {/* Ring 2 */}
+        <mesh ref={ring2Ref} rotation={[Math.PI / 4, 0, 0]}>
+          <torusGeometry args={[2.7, 0.02, 16, 100]} />
+          <meshStandardMaterial color="#ffffff" transparent opacity={0.35} />
         </mesh>
 
-        {/* Layer 4: Outer Satellite Ring */}
-        <mesh ref={ring3Ref} rotation={[0, Math.PI / 4, Math.PI / 6]}>
-          <torusGeometry args={[3.7, 0.015, 16, 100]} />
-          <meshStandardMaterial color={themeColor} transparent opacity={0.5} />
+        {/* Ring 3 */}
+        <mesh ref={ring3Ref} rotation={[0, Math.PI / 3, Math.PI / 6]}>
+          <torusGeometry args={[3.4, 0.015, 16, 100]} />
+          <meshStandardMaterial color={themeColor} transparent opacity={0.4} />
+        </mesh>
+
+        {/* Ring 4: Outer Perimeter Satellite */}
+        <mesh ref={ring4Ref} rotation={[Math.PI / 2, Math.PI / 4, 0]}>
+          <torusGeometry args={[4.1, 0.01, 16, 100]} />
+          <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.5} transparent opacity={0.3} />
         </mesh>
       </Float>
     </group>
   );
 }
 
-// --- MAIN APPLICATION ---
+// --- MAIN APP ---
 export default function App() {
   const [selectedService, setSelectedService] = useState('all');
-  const [selectedTier, setSelectedTier] = useState('Growth');
+  const [selectedTier, setSelectedTier] = useState('Free');
   const [formData, setFormData] = useState({
     industry: 'Fintech & Automated Payments',
     budget: '$50k - $100k',
@@ -94,20 +104,25 @@ export default function App() {
   const workspaceRef = useRef(null);
   const scrollToWorkspace = () => workspaceRef.current?.scrollIntoView({ behavior: 'smooth' });
 
+  // 10 Expanded Service Layers
   const servicesList = [
     { id: 'all', title: 'Full Autonomous Suite', desc: 'End-to-end orchestration from market sizing to production code.', icon: '⚡' },
-    { id: 'market', title: 'Market Intelligence Scraper', desc: 'Real-time TAM/SAM/SOM calculations and competitor audits.', icon: '📊' },
+    { id: 'market', title: 'Market Intelligence Scraper', desc: 'Real-time TAM/SAM/SOM calculations and competitor matrix audits.', icon: '📊' },
     { id: 'mvp', title: 'Automated MVP Generator', desc: 'Generates production-grade backend boilerplate & DB schemas.', icon: '🛠️' },
     { id: 'pitch', title: 'Seed Deck Architect', desc: 'Structures YC-style investor narratives and financial runways.', icon: '🚀' },
     { id: 'compliance', title: 'Risk & Regulatory Audit', desc: 'Scans sector-specific compliance rules and security vectors.', icon: '🛡️' },
     { id: 'neural', title: 'Neural Code Refactorer', desc: 'Optimizes microservice architecture and identifies logic bottlenecks.', icon: '🧬' },
     { id: 'tax', title: 'Global Tax & Legal Engine', desc: 'Analyzes cross-border tax structures and entity incorporation.', icon: '🌐' },
-    { id: 'vc', title: 'Venture Capital Matchmaker', desc: 'Aligns your startup profile with active institutional investors.', icon: '💼' }
+    { id: 'vc', title: 'Venture Capital Matchmaker', desc: 'Aligns your startup profile with active institutional investors.', icon: '💼' },
+    { id: 'quantum', title: 'Quantum Predictive Modeling', desc: 'Simulates 5-year macro economic volatility trends.', icon: '⚛️' },
+    { id: 'cyber', title: 'Zero-Trust Cyber Sentinel', desc: 'Performs automated penetration testing simulations on API routes.', icon: '🔒' }
   ];
 
+  // Pricing Plans (Now includes Free Tier)
   const pricingPlans = [
-    { name: 'Starter', price: '$99', desc: 'Ideal for solo founders testing early concepts.', features: ['1 Autonomous Pipeline / mo', 'Basic Market Scraper', 'Standard Support'] },
-    { name: 'Growth', price: '$299', desc: 'For scaling startups building production MVPs.', features: ['Unlimited Pipelines', 'Advanced 3D Architecture Engine', 'Priority API Access', 'Custom Code Export'] },
+    { name: 'Free', price: '$0', desc: 'Designed for student explorers and indie hackers starting out.', features: ['3 Pipeline Executions / mo', 'Standard Market Scraper', 'Community Support', 'Basic Code Snippets'] },
+    { name: 'Starter', price: '$99', desc: 'Ideal for solo founders testing early concepts.', features: ['25 Pipelines / mo', 'Advanced TAM/SAM Scraper', 'Priority Email Support', 'Standard API Export'] },
+    { name: 'Growth', price: '$299', desc: 'For scaling startups building production MVPs.', features: ['Unlimited Pipelines', 'Full 3D Architecture Engine', 'Priority API Access', 'Custom Code Export'] },
     { name: 'Enterprise', price: '$899', desc: 'For institutional execution and VC syndicates.', features: ['Dedicated Agent Clusters', 'Custom Legal & Tax Modules', '24/7 Dedicated Architect', 'White-Label Reports'] }
   ];
 
@@ -180,7 +195,7 @@ export default function App() {
     <div className="min-h-screen bg-[#020617] text-slate-200 font-sans flex flex-col overflow-x-hidden selection:bg-indigo-500/30">
       
       {/* --- HERO LANDING SECTION --- */}
-      <div className="w-full min-h-[90vh] flex flex-col relative z-10 bg-gradient-to-b from-[#020617] via-[#070d1d] to-[#020617] border-b border-indigo-500/10">
+      <div className="w-full min-h-[95vh] flex flex-col relative z-10 bg-gradient-to-b from-[#020617] via-[#070d1d] to-[#020617] border-b border-indigo-500/10">
         <header className="px-8 py-6 flex justify-between items-center w-full max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 rounded-full bg-indigo-500 animate-pulse shadow-lg shadow-indigo-500/50" />
@@ -188,27 +203,28 @@ export default function App() {
               NEXUS <span className="text-indigo-400">AI</span>
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
+            <a href="#features" className="text-sm font-semibold text-slate-300 hover:text-white transition hidden sm:block">Features</a>
             <a href="#pricing" className="text-sm font-semibold text-slate-300 hover:text-white transition">Pricing</a>
-            <a href="#about" className="text-sm font-semibold text-slate-300 hover:text-white transition">About Us</a>
+            <a href="#about" className="text-sm font-semibold text-slate-300 hover:text-white transition hidden sm:block">About Us</a>
             <button onClick={scrollToWorkspace} className="px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-600/30">
               Launch App
             </button>
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 max-w-5xl mx-auto my-12">
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 max-w-5xl mx-auto my-16">
           <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
-            Multi-Layered Autonomous Enterprise Engine
+            Next-Gen Autonomous Enterprise Engine
           </div>
           <h2 className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
-            Architecting the future through <br />
+            Architecting global ventures through <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">
-              autonomous AI layers.
+              spatial AI orchestration.
             </span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mb-12 leading-relaxed">
-            Select from 8 specialized AI architecture tiers, input your operational roadblock, and compile your entire corporate roadmap, compliance check, and production backend instantly.
+            Choose from 10 specialized architecture layers. Input your operational bottleneck and watch our multi-agent framework compile market data, financial models, and production code in real-time.
           </p>
           
           {/* Bento Grid Preview */}
@@ -227,23 +243,23 @@ export default function App() {
           </div>
         </div>
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-indigo-600/15 blur-[140px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-indigo-600/15 blur-[160px] rounded-full pointer-events-none" />
       </div>
 
       {/* --- WORKSPACE SPLIT VIEW --- */}
       <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative border-b border-slate-800">
         
         {/* LEFT COLUMN: Controls & Outputs */}
-        <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-12 gap-8">
+        <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-16 gap-8">
           
-          <div className="bg-[#0a0f1c] border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
+          <div className="bg-[#0a0f1c] border border-white/5 rounded-3xl p-8 lg:p-10 shadow-2xl backdrop-blur-xl">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-6 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-              Expanded Service Layer Configuration ({servicesList.length} Layers Available)
+              Expanded Service Layer Configuration ({servicesList.length} Active Nodes)
             </h3>
 
             {/* Service Tier Selector Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 max-h-[360px] overflow-y-auto pr-2 custom-scrollbar">
               {servicesList.map((srv) => (
                 <button
                   key={srv.id}
@@ -363,7 +379,7 @@ export default function App() {
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/5 bg-[#02050f] z-0 overflow-hidden">
           <div className="absolute top-6 left-6 z-10 flex items-center gap-2 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/60 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            Active Layer: <span className="text-cyan-300 font-bold">{selectedService.toUpperCase()}</span>
+            Spatial Core Layer: <span className="text-cyan-300 font-bold">{selectedService.toUpperCase()}</span>
           </div>
 
           <Canvas camera={{ position: [0, 0, 8] }}>
@@ -371,7 +387,7 @@ export default function App() {
             <pointLight position={[10, 10, 10]} intensity={2.5} color="#ffffff" />
             <pointLight position={[-10, -10, -10]} intensity={1.5} color="#6366f1" />
             <Stars radius={150} depth={50} count={5000} factor={5} saturation={0.5} fade speed={1} />
-            <LayeredAgentCore activeService={selectedService} />
+            <EnterpriseSpatialCore activeService={selectedService} />
             <OrbitControls enableZoom={false} enablePan={false} autoRotate={agentPhase === 'idle'} autoRotateSpeed={1} />
           </Canvas>
           
@@ -379,44 +395,80 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- DETAILED ABOUT US & SERVICES SECTION --- */}
-      <section id="about" className="py-24 px-8 max-w-7xl mx-auto w-full border-b border-slate-800">
+      {/* --- EXTENDED FEATURES SHOWCASE SECTION --- */}
+      <section id="features" className="py-24 px-8 max-w-7xl mx-auto w-full border-b border-slate-800">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Enterprise Infrastructure</h3>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Built for founders, backed by autonomous multi-agent intelligence.</h2>
+          <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Modular Capabilities</h3>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Engineered for absolute operational dominance.</h2>
           <p className="text-slate-400 leading-relaxed">
-            Nexus AI eliminates manual friction by deploying specialized sub-agents that simultaneously conduct market research, draft financial projections, write clean backend microservices, and audit regulatory compliance.
+            Every module in Nexus AI operates as an independent micro-agent trained on thousands of institutional venture playbooks and technical architectures.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl font-bold mb-6">01</div>
-            <h4 className="text-lg font-bold text-white mb-3">Multi-Agent Orchestration</h4>
-            <p className="text-slate-400 text-sm leading-relaxed">Our pipeline triggers parallel LLM reasoning passes to cross-verify market validation metrics against live technical constraints.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[
+            { title: 'Real-Time Market Scraper', desc: 'Instantly computes TAM, SAM, SOM metrics and scrapes live competitive friction vectors.', icon: '📊' },
+            { title: 'Automated MVP Engine', desc: 'Writes robust backend API schemas in Node.js, Python, or Go tailored to your bottlenecks.', icon: '🛠️' },
+            { title: 'YC-Style Deck Architect', desc: 'Structures compelling investor narratives, unit economics, and burn-rate runways.', icon: '🚀' },
+            { title: 'Regulatory Compliance Scanner', desc: 'Analyzes cross-border data protection laws (GDPR, HIPAA, SOC2) automatically.', icon: '🛡️' },
+            { title: 'Neural Code Refactorer', desc: 'Identifies memory leaks, latency bottlenecks, and structural anti-patterns in your codebase.', icon: '🧬' },
+            { title: 'Global Tax Synthesizer', desc: 'Evaluates tax optimization strategies and Delaware/international entity incorporation.', icon: '🌐' }
+          ].map((feat, idx) => (
+            <div key={idx} className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md hover:border-indigo-500/40 transition group">
+              <div className="text-3xl mb-4">{feat.icon}</div>
+              <h4 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition">{feat.title}</h4>
+              <p className="text-slate-400 text-sm leading-relaxed">{feat.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* --- DETAILED ABOUT US SECTION --- */}
+      <section id="about" className="py-24 px-8 max-w-7xl mx-auto w-full border-b border-slate-800">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">About Nexus Systems</h3>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Empowering the next generation of full-stack founders.</h2>
+            <p className="text-slate-300 leading-relaxed mb-6">
+              Nexus AI was engineered to bridge the gap between initial ideation and production-ready execution. By combining spatial 3D visualization with advanced LLM multi-agent reasoning, we turn complex corporate roadblocks into actionable blueprints in seconds.
+            </p>
+            <div className="grid grid-cols-2 gap-6 pt-4 border-t border-slate-800">
+              <div>
+                <div className="text-3xl font-extrabold text-white mb-1">10+</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wider">Autonomous AI Layers</div>
+              </div>
+              <div>
+                <div className="text-3xl font-extrabold text-white mb-1">99.9%</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wider">System Uptime & Resilience</div>
+              </div>
+            </div>
           </div>
-          <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
-            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl font-bold mb-6">02</div>
-            <h4 className="text-lg font-bold text-white mb-3">Production-Grade Output</h4>
-            <p className="text-slate-400 text-sm leading-relaxed">Unlike generic text generators, Nexus outputs structured JSON payloads containing production-ready boilerplate and 90-day execution milestones.</p>
-          </div>
-          <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold mb-6">03</div>
-            <h4 className="text-lg font-bold text-white mb-3">Secure & Resilient</h4>
-            <p className="text-slate-400 text-sm leading-relaxed">Equipped with automatic retry wrappers and offline fallback resilience to ensure 99.9% uptime during high traffic spikes.</p>
+          <div className="bg-gradient-to-br from-indigo-950/40 to-slate-900/60 border border-indigo-500/20 p-8 lg:p-12 rounded-3xl backdrop-blur-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
+            <h4 className="text-xl font-bold text-white mb-4">Our Core Philosophy</h4>
+            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+              "We believe that building a startup should be limited only by imagination, not by administrative friction or engineering bottlenecks."
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-lg">N</div>
+              <div>
+                <div className="font-bold text-white text-sm">Nexus AI Core Architecture</div>
+                <div className="text-xs text-slate-400">Distributed Multi-Agent System</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* --- PREMIUM SUBSCRIPTION PURCHASING SECTION --- */}
+      {/* --- PRICING & SUBSCRIPTION SECTION (WITH FREE TIER) --- */}
       <section id="pricing" className="py-24 px-8 max-w-7xl mx-auto w-full">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Flexible Pricing</h3>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Accelerate your venture with transparent tiers.</h2>
-          <p className="text-slate-400 leading-relaxed">Select a subscription tier to unlock unlimited pipeline executions, custom API endpoints, and dedicated multi-agent clusters.</p>
+          <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Transparent Subscriptions</h3>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Choose the exact tier that fits your venture.</h2>
+          <p className="text-slate-400 leading-relaxed">From zero-cost student explorations to institutional enterprise clusters, we scale with your growth.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {pricingPlans.map((plan, idx) => (
             <div 
               key={idx}
@@ -443,14 +495,14 @@ export default function App() {
                 </ul>
               </div>
               <button 
-                onClick={() => alert(`Redirecting to secure checkout for ${plan.name} Tier (${plan.price}/mo)...`)}
+                onClick={() => alert(`Activated ${plan.name} Tier successfully!`)}
                 className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition ${
                   selectedTier === plan.name
                     ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
                     : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
                 }`}
               >
-                Get Started with {plan.name}
+                {plan.name === 'Free' ? 'Get Started Free' : `Select ${plan.name}`}
               </button>
             </div>
           ))}
