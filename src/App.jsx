@@ -35,16 +35,23 @@ function SpatialUniverse({ phase, activeService }) {
 
   return (
     <group>
-      <Float floatIntensity="{2}" rotationIntensity="{1.2}" speed="{2}">
+      <Float speed={2} rotationIntensity={1.2} floatIntensity={2}>
         {/* Central Distorted Core */}
         <mesh ref={coreRef}>
           <icosahedronGeometry args={[1.3, 0]} />
-          <MeshDistortMaterial !="=" 'idle'} color="{color}" distort="{0.4}" metalness="{0.9}" roughness="{0.1}" speed="{3}" wireframe="{phase"/>
+          <MeshDistortMaterial 
+            color={color} 
+            speed={3} 
+            distort={0.4} 
+            roughness={0.1} 
+            metalness={0.9} 
+            wireframe={phase !== 'idle'} 
+          />
         </mesh>
 
         {/* Orbiting Torus Knot */}
         <group ref={knotRef} scale={[0.8, 0.8, 0.8]}>
-          <TorusKnot 0.05, 128, 32]} args="{[1.8,">
+          <TorusKnot args={[1.8, 0.05, 128, 32]}>
             <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} />
           </TorusKnot>
         </group>
@@ -170,7 +177,8 @@ export default function App() {
 
     } catch (err) {
       console.error("API Error Details:", err);
-      setError(`Execution error: ${err.message || "Unknown error occurred"}`);
+      // Explicitly displays the exact error message on the screen for instant debugging
+      setError(`API Error: ${err.message || JSON.stringify(err)}`);
       setAgentPhase('idle');
     }
   };
