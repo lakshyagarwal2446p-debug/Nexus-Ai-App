@@ -22,11 +22,11 @@ function LayeredAgentCore({ activeService }) {
 
   const getThemeColor = () => {
     switch (activeService) {
-      case 'market': return '#3b82f6';   // Deep Blue
-      case 'mvp': return '#10b981';      // Emerald Green
-      case 'pitch': return '#f59e0b';    // Amber Gold
-      case 'compliance': return '#ef4444'; // Crimson Red
-      default: return '#6366f1';         // Indigo Default
+      case 'market': return '#3b82f6';   
+      case 'mvp': return '#10b981';      
+      case 'pitch': return '#f59e0b';    
+      case 'compliance': return '#ef4444'; 
+      default: return '#6366f1';         
     }
   };
 
@@ -35,7 +35,6 @@ function LayeredAgentCore({ activeService }) {
   return (
     <group>
       <Float speed={2.5} rotationIntensity={1.5} floatIntensity={2}>
-        {/* Layer 1: Core Processor Node */}
         <mesh ref={coreRef}>
           <octahedronGeometry args={[1.4, 0]} />
           <meshStandardMaterial 
@@ -48,13 +47,11 @@ function LayeredAgentCore({ activeService }) {
           />
         </mesh>
 
-        {/* Layer 2: Inner Data Ring */}
         <mesh ref={ring1Ref}>
           <torusGeometry args={[2.2, 0.03, 16, 100]} />
           <meshStandardMaterial color={themeColor} emissive={themeColor} emissiveIntensity={0.8} />
         </mesh>
 
-        {/* Layer 3: Outer Orbital Architecture Ring */}
         <mesh ref={ring2Ref} rotation={[Math.PI / 3, 0, 0]}>
           <torusGeometry args={[2.9, 0.02, 16, 100]} />
           <meshStandardMaterial color="#ffffff" transparent opacity={0.3} />
@@ -90,6 +87,23 @@ export default function App() {
     { id: 'compliance', title: 'Risk & Regulatory Audit', desc: 'Scans sector-specific compliance rules and data security vectors.', icon: '🛡️' }
   ];
 
+  // Helper function with automatic retry for 503 traffic spikes
+  const generateWithRetry = async (model, prompt, retries = 3, delay = 2000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const result = await model.generateContent(prompt);
+        return result;
+      } catch (err) {
+        if (err.message && err.message.includes('503') && i < retries - 1) {
+          setProgressLog(prev => [...prev, `[SYSTEM] High server demand detected. Auto-retrying (${i + 1}/${retries})...`]);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          throw err;
+        }
+      }
+    }
+  };
+
   const runAgentPipeline = async () => {
     if (!formData.problem.trim() || agentPhase !== 'idle') return;
     
@@ -107,7 +121,7 @@ export default function App() {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-3.8-flash", // Updated to Google's recommended active endpoint
+        model: "gemini-3.8-flash",
         generationConfig: { responseMimeType: "application/json" }
       });
 
@@ -131,8 +145,9 @@ export default function App() {
       setTimeout(() => setAgentPhase('architecture'), 3600);
       setTimeout(() => setAgentPhase('roadmap'), 5400);
 
-      const result = await model.generateContent(prompt);
-      const parsedData = JSON.parse(result.response.text());
+      // Call with automatic retry fallback
+      const apiResponse = await generateWithRetry(model, prompt);
+      const parsedData = JSON.parse(apiResponse.response.text());
 
       setResults(parsedData);
       setAgentPhase('idle');
@@ -141,7 +156,7 @@ export default function App() {
 
     } catch (err) {
       console.error(err);
-      setError("Pipeline execution failed. Check console for details.");
+      setError("Server traffic spike is ongoing. Please wait 10 seconds and click execute again.");
       setAgentPhase('idle');
     }
   };
@@ -177,7 +192,6 @@ export default function App() {
             Select your specialized architecture tier, input your operational roadblock, and let our multi-agent framework compile your entire corporate roadmap and technical backend.
           </p>
           
-          {/* SERVICES OVERVIEW GRID (BENTO MINI) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-10 text-left">
             {servicesList.slice(1).map((s) => (
               <div 
@@ -199,7 +213,6 @@ export default function App() {
       {/* --- WORKSPACE SPLIT VIEW --- */}
       <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative">
         
-        {/* LEFT COLUMN: Controls & Outputs */}
         <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-12 gap-8">
           
           <div className="bg-[#0a0f1c] border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
@@ -208,7 +221,6 @@ export default function App() {
               Service Layer Configuration
             </h3>
 
-            {/* Service Tier Selector Tabs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
               {servicesList.map((srv) => (
                 <button
@@ -284,7 +296,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* Results Render */}
           {results && (
             <div className="bg-slate-900/40 border border-indigo-500/20 rounded-3xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-700">
               <div className="flex overflow-x-auto gap-3 border-b border-slate-800 pb-5 mb-6 custom-scrollbar">
@@ -324,7 +335,6 @@ export default function App() {
           <div className="h-24"></div>
         </div>
 
-        {/* RIGHT COLUMN: Sticky 3D Layer Visualizer */}
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/5 bg-[#02050f] z-0 overflow-hidden">
           <div className="absolute top-6 left-6 z-10 flex items-center gap-2 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/60 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
