@@ -89,7 +89,7 @@ export default function App() {
     problem: 'Cross-border B2B transactions suffer from a 3-day settlement lag and high foreign exchange tracking overhead.'
   });
 
-  const [activeService, setActiveService] = useState('market'); // market | strategy | code | pitch
+  const [activeService, setActiveService] = useState('market');
   const [agentPhase, setAgentPhase] = useState('idle');
   const [progressLog, setProgressLog] = useState([]);
   const [results, setResults] = useState(null);
@@ -113,16 +113,18 @@ export default function App() {
       return;
     }
 
-    setProgressLog(['[SYSTEM] Initializing Nexus AI Multi-Layered Engine...']);
+    setProgressLog(['[SYSTEM] Initializing Nexus AI Live Gemini Engine...']);
     setAgentPhase('research');
     setResults(null);
     setError(null);
 
     try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      // Using gemini-pro for stable API routing
       const model = genAI.getGenerativeModel({ 
-  model: "gemini-pro",
-  generationConfig: { responseMimeType: "application/json" }
-});
+        model: "gemini-pro",
+        generationConfig: { responseMimeType: "application/json" }
+      });
 
       const prompt = `
         You are Nexus AI, an elite enterprise autonomous startup architect. 
@@ -147,13 +149,12 @@ export default function App() {
       const result = await model.generateContent(prompt);
       const responseText = result.response.text();
       
-      // Bulletproof cleanup for markdown formatting blocks
       const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsedData = JSON.parse(cleanedText);
 
       setResults(parsedData);
       setAgentPhase('idle');
-      setProgressLog(prev => [...prev, '[SUCCESS] All layers successfully processed and synthesized.']);
+      setProgressLog(prev => [...prev, '[SUCCESS] Live AI generation complete. Payload secured.']);
 
     } catch (err) {
       console.error(err);
@@ -199,58 +200,41 @@ export default function App() {
             </span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mb-12 leading-relaxed">
-            Harness autonomous LLM orchestration to generate validated market models, monetization playbooks, and production-ready code in real-time.
+            Harness live autonomous LLM orchestration to generate validated market models, monetization playbooks, and production-ready code in real-time.
           </p>
 
-          {/* --- SERVICES PROVIDED GRID (WORKING BUTTONS) --- */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full text-left mb-8">
-            
             <div onClick={() => scrollToSection(workspaceRef, 'market')} className="group bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold mb-4 group-hover:scale-110 transition">01</div>
-              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
-                Market Data <span className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">TAM/SAM/SOM calculations, competitor matrices, and vulnerability scanning.</p>
+              <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center text-blue-400 font-bold mb-4">01</div>
+              <h3 className="font-bold text-white mb-2 text-base">Market Data</h3>
+              <p className="text-xs text-slate-400">TAM/SAM/SOM calculations and competitor matrices.</p>
             </div>
-
             <div onClick={() => scrollToSection(workspaceRef, 'strategy')} className="group bg-slate-900/60 border border-slate-800 hover:border-purple-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 font-bold mb-4 group-hover:scale-110 transition">02</div>
-              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
-                Business Model <span className="text-xs text-purple-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">Lean canvas structure, tiered subscription logic, and customer acquisition models.</p>
+              <div className="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center text-purple-400 font-bold mb-4">02</div>
+              <h3 className="font-bold text-white mb-2 text-base">Business Model</h3>
+              <p className="text-xs text-slate-400">Lean canvas and tiered subscription structures.</p>
             </div>
-
             <div onClick={() => scrollToSection(workspaceRef, 'code')} className="group bg-slate-900/60 border border-slate-800 hover:border-emerald-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold mb-4 group-hover:scale-110 transition">03</div>
-              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
-                Architecture <span className="text-xs text-emerald-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">Production-ready backend boilerplate scripts designed for instant deployment.</p>
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-400 font-bold mb-4">03</div>
+              <h3 className="font-bold text-white mb-2 text-base">Architecture</h3>
+              <p className="text-xs text-slate-400">Production-ready backend scripts for deployment.</p>
             </div>
-
             <div onClick={() => scrollToSection(workspaceRef, 'pitch')} className="group bg-slate-900/60 border border-slate-800 hover:border-amber-500/50 p-6 rounded-2xl cursor-pointer transition-all backdrop-blur-md shadow-xl">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-4 group-hover:scale-110 transition">04</div>
-              <h3 className="font-bold text-white mb-2 text-base flex justify-between items-center">
-                Investor Pitch <span className="text-xs text-amber-400 opacity-0 group-hover:opacity-100 transition">Explore →</span>
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">Y-Combinator seed deck frameworks configured for immediate VC review.</p>
+              <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-400 font-bold mb-4">04</div>
+              <h3 className="font-bold text-white mb-2 text-base">Investor Pitch</h3>
+              <p className="text-xs text-slate-400">Y-Combinator seed deck frameworks.</p>
             </div>
-
           </div>
         </div>
       </div>
 
       {/* --- APP WORKSPACE SPLIT VIEW --- */}
       <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative border-t border-white/5">
-        
-        {/* LEFT COLUMN: Scrollable Dashboard */}
         <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-12 gap-8">
-          
           <div className="bg-[#0a0f1c] border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-6 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-              Multi-Layered Agent Configuration
+              Live Gemini Agent Configuration
             </h3>
             
             {error && (
@@ -305,13 +289,12 @@ export default function App() {
                   : 'bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
             >
-              {agentPhase === 'idle' ? 'Execute Multi-Layered Generation' : `Processing Layer: ${agentPhase.toUpperCase()}...`}
+              {agentPhase === 'idle' ? 'Execute Live AI Generation' : `Processing Layer: ${agentPhase.toUpperCase()}...`}
             </button>
           </div>
 
-          {/* Results Render */}
           {results && (
-            <div className="bg-slate-900/40 border border-indigo-500/20 rounded-3xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-700">
+            <div className="bg-slate-900/40 border border-indigo-500/20 rounded-3xl p-8 shadow-2xl animate-in fade-in duration-700">
               <div className="flex overflow-x-auto gap-3 border-b border-slate-800 pb-5 mb-6 custom-scrollbar">
                 {[
                   { id: 'market', label: '1. Market Data' },
@@ -325,7 +308,7 @@ export default function App() {
                     className={`px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                       activeService === tab.id
                         ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
-                        : 'text-slate-400 hover:text-white bg-black/20 hover:bg-black/50 border border-slate-800'
+                        : 'text-slate-400 hover:text-white bg-black/20 border border-slate-800'
                     }`}
                   >
                     {tab.label}
@@ -348,7 +331,6 @@ export default function App() {
           )}
         </div>
 
-        {/* RIGHT COLUMN: Sticky 3D Multi-Layered Visualizer */}
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/5 bg-[#02050f] z-0 overflow-hidden">
           <div className="absolute top-20 left-6 z-10 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/60 px-3 py-1 rounded-full border border-white/10 backdrop-blur-md flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
@@ -368,122 +350,18 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- EXTENDED CONTENT SECTION: ARCHITECTURE DEEP DIVE --- */}
+      {/* --- ARCHITECTURE & PRICING SECTIONS --- */}
       <div ref={architectureRef} className="w-full py-24 px-6 lg:px-16 bg-[#040817] border-t border-white/5 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-xs uppercase tracking-widest text-indigo-400 font-bold px-3 py-1 rounded-full bg-indigo-950/50 border border-indigo-500/20">
-              Technical Specification
-            </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 mb-3">
-              How Nexus AI Orchestrates Autonomous Workflows
-            </h2>
-            <p className="text-slate-400 max-w-xl mx-auto text-sm">
-              Built on a decoupled full-stack architecture combining high-performance React spatial rendering with structured generative AI pipelines.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl">
-              <div className="text-indigo-400 font-mono text-xl mb-4">01 // INGESTION</div>
-              <h3 className="text-lg font-bold text-white mb-2">Vector Parameter Mapping</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                User inputs are sanitized and structured into high-dimensional feature vectors that represent market friction, capital constraints, and industry targets.
-              </p>
-            </div>
-            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl">
-              <div className="text-cyan-400 font-mono text-xl mb-4">02 // SYNTHESIS</div>
-              <h3 className="text-lg font-bold text-white mb-2">Multi-Agent Orchestration</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                The Gemini 1.5 Flash inference engine concurrently dispatches specialized sub-agents for market valuation, revenue modeling, and API scaffolding.
-              </p>
-            </div>
-            <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-2xl">
-              <div className="text-emerald-400 font-mono text-xl mb-4">03 // DEPLOYMENT</div>
-              <h3 className="text-lg font-bold text-white mb-2">Automated Code Emission</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Guaranteed JSON schema output streams clean, production-ready backend code directly into the client application view for immediate inspection.
-              </p>
-            </div>
-          </div>
+        <div className="max-w-6xl mx-auto text-center mb-16">
+          <h2 className="text-3xl font-extrabold text-white mb-3">Technical Specification</h2>
+          <p className="text-slate-400 text-sm">Decoupled full-stack architecture combining high-performance React spatial rendering with live Gemini intelligence.</p>
         </div>
       </div>
 
-      {/* --- EXTENDED CONTENT SECTION: PRICING & TIERS --- */}
-      <div ref={pricingRef} className="w-full py-24 px-6 lg:px-16 bg-[#020617] border-t border-white/5 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-xs uppercase tracking-widest text-cyan-400 font-bold px-3 py-1 rounded-full bg-cyan-950/50 border border-cyan-500/20">
-              Commercial Tiers
-            </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-4 mb-3">
-              Transparent Access Plans
-            </h2>
-            <p className="text-slate-400 max-w-xl mx-auto text-sm">
-              Choose your deployment scale. From individual student creators to institutional venture studios.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
-            <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 flex flex-col justify-between">
-              <div>
-                <div className="text-xs font-mono text-indigo-400 uppercase tracking-widest mb-2">Developer Tier</div>
-                <div className="text-4xl font-extrabold text-white mb-4">$0 <span className="text-sm font-normal text-slate-400">/ month</span></div>
-                <p className="text-xs text-slate-400 mb-6 leading-relaxed">Perfect for open-source builders, hackathons, and portfolio showcases.</p>
-                <ul className="flex flex-col gap-3 text-xs text-slate-300 mb-8">
-                  <li className="flex items-center gap-2">✓ 50 Autonomous Runs / Month</li>
-                  <li className="flex items-center gap-2">✓ Standard 3D Spatial Visualizer</li>
-                  <li className="flex items-center gap-2">✓ Markdown & JSON Code Export</li>
-                  <li className="flex items-center gap-2">✓ Community Discord Support</li>
-                </ul>
-              </div>
-              <button 
-                onClick={() => scrollToSection(workspaceRef, 'market')}
-                className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer"
-              >
-                Get Started Free
-              </button>
-            </div>
-
-            <div className="bg-gradient-to-b from-indigo-950/40 to-slate-900/50 border border-indigo-500/40 rounded-3xl p-8 flex flex-col justify-between relative shadow-2xl shadow-indigo-500/10">
-              <div className="absolute -top-3 right-8 bg-indigo-600 text-white font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
-                Most Popular
-              </div>
-              <div>
-                <div className="text-xs font-mono text-cyan-400 uppercase tracking-widest mb-2">Enterprise Studio</div>
-                <div className="text-4xl font-extrabold text-white mb-4">$49 <span className="text-sm font-normal text-slate-400">/ month</span></div>
-                <p className="text-xs text-slate-400 mb-6 leading-relaxed">Designed for startup founders and venture builders requiring unlimited scale.</p>
-                <ul className="flex flex-col gap-3 text-xs text-slate-300 mb-8">
-                  <li className="flex items-center gap-2">✓ Unlimited Autonomous Runs</li>
-                  <li className="flex items-center gap-2">✓ Advanced Multi-Layered 3D Engine</li>
-                  <li className="flex items-center gap-2">✓ Custom API Rate Limits & Webhooks</li>
-                  <li className="flex items-center gap-2">✓ Direct Investor Pitch Deck Sync</li>
-                </ul>
-              </div>
-              <button 
-                onClick={() => scrollToSection(workspaceRef, 'market')}
-                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer shadow-lg shadow-indigo-600/30"
-              >
-                Deploy Enterprise Suite
-              </button>
-            </div>
-
-          </div>
-        </div>
+      <div ref={pricingRef} className="w-full py-24 px-6 lg:px-16 bg-[#020617] border-t border-white/5 relative z-10 text-center">
+        <h2 className="text-3xl font-extrabold text-white mb-3">Commercial Access Plans</h2>
+        <p className="text-slate-400 text-sm mb-8">Deploy at scale with transparent developer and enterprise tiers.</p>
       </div>
-
-      {/* --- FOOTER --- */}
-      <footer className="w-full py-12 px-8 border-t border-white/5 bg-[#01040f] text-center text-xs text-slate-500 relative z-10 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto gap-4">
-        <div>
-          Nexus AI Autonomous Architect © 2026. Built for high-performance portfolio deployment.
-        </div>
-        <div className="flex gap-6">
-          <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition">GitHub Repository</a>
-          <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition">Professional Network</a>
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-slate-300 transition">Back to Top ↑</button>
-        </div>
-      </footer>
 
     </div>
   );
