@@ -37,11 +37,18 @@ function SpatialUniverse({ phase, activeService }) {
 
   return (
     <group>
-      <Float floatIntensity="{2}" rotationIntensity="{1.2}" speed="{2.2}">
+      <Float speed={2.2} rotationIntensity={1.2} floatIntensity={2}>
         {/* Central Distorted Core */}
         <mesh ref={coreRef}>
           <icosahedronGeometry args={[1.2, 0]} />
-          <MeshDistortMaterial !="=" 'idle'} color="{color}" distort="{0.4}" metalness="{0.9}" roughness="{0.1}" speed="{3}" wireframe="{phase"/>
+          <MeshDistortMaterial 
+            color={color} 
+            speed={3} 
+            distort={0.4} 
+            roughness={0.1} 
+            metalness={0.9} 
+            wireframe={phase !== 'idle'} 
+          />
         </mesh>
 
         {/* Outer Security Shield Mesh */}
@@ -52,7 +59,7 @@ function SpatialUniverse({ phase, activeService }) {
 
         {/* Orbiting Torus Knot */}
         <group ref={knotRef} scale={[0.7, 0.7, 0.7]}>
-          <TorusKnot 0.04, 128, 32]} args="{[1.9,">
+          <TorusKnot args={[1.9, 0.04, 128, 32]}>
             <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.9} />
           </TorusKnot>
         </group>
@@ -153,7 +160,6 @@ export default function App() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Clean model initialization compatible with all API key tiers
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const cleanIndustry = sanitizeInput(formData.industry);
@@ -221,7 +227,7 @@ export default function App() {
       {/* --- HERO SECTION --- */}
       <div className="w-full min-h-screen flex flex-col justify-center items-center relative z-10 px-4 pt-28 text-center">
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-[11px] font-medium tracking-wider uppercase backdrop-blur-xl">
-          Zero-Trust Spatial Intelligence v3.7
+          Zero-Trust Spatial Intelligence v3.8
         </div>
         <h2 className="text-5xl md:text-8xl font-semibold tracking-tighter text-white mb-6 leading-none max-w-5xl">
           Secure enterprise, <br />
