@@ -112,7 +112,7 @@ export default function App() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Security Sanitization to prevent malicious injection
+  // Security Sanitization
   const sanitizeInput = (str) => {
     return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
               .replace(/</g, "&lt;")
@@ -123,15 +123,15 @@ export default function App() {
     const modals = {
       specs: {
         title: "Spatial Neural Architecture & Security Specs",
-        content: "Nexus AI enforces Zero-Trust cryptographic validation. All client inputs pass through real-time regex sanitization, preventing cross-site scripting (XSS) and injection attempts. Powered by React 19, Three.js, and Google Gemini 1.5 Flash."
+        content: "Nexus AI enforces Zero-Trust cryptographic validation. All client inputs pass through real-time regex sanitization, preventing cross-site scripting (XSS). Powered by React, Three.js, and Google Gemini 1.5 Flash."
       },
       telemetry: {
         title: "Live Security & Threat Telemetry",
-        content: "Firewall Status: ACTIVE (TLS 1.3 End-to-End Encryption). Rate-Limit Token Bucket: Operational. Zero unauthorized intrusion attempts detected in the current session cluster."
+        content: "Firewall Status: ACTIVE (TLS 1.3 End-to-End Encryption). Rate-Limit Token Bucket: Operational. Zero unauthorized intrusion attempts detected in current session cluster."
       },
       whitepaper: {
         title: "Executive Security Whitepaper",
-        content: "Our autonomous agentic engine isolates execution context inside secure edge virtualizations. Proprietary venture data is never stored on unvetted third-party storage nodes."
+        content: "Our autonomous agentic engine isolates execution context inside secure edge virtualizations. Proprietary venture data is never stored on unvetted public cloud endpoints."
       }
     };
     setModalData(modals[type]);
@@ -140,7 +140,7 @@ export default function App() {
   const runAgentPipeline = async () => {
     if (!formData.problem.trim() || agentPhase !== 'idle') return;
 
-    // Security Rate Limiter (Prevents spam bot attacks / accidental double clicks)
+    // Rate Limiter
     const now = Date.now();
     if (now - lastExecution < 4000) {
       setError("Security Shield: Rate limit active. Please wait a few seconds between requests.");
@@ -160,7 +160,7 @@ export default function App() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      // Enforcing strict JSON response type to guarantee valid parsing
+      // Using the verified, stable gemini-1.5-flash model endpoint
       const model = genAI.getGenerativeModel({ 
         model: "gemini-1.5-flash",
         generationConfig: { responseMimeType: "application/json" }
@@ -206,7 +206,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#000000] text-slate-100 font-sans flex flex-col overflow-x-hidden selection:bg-cyan-500/30">
       
-      {/* --- APPLE-GRADE NAVBAR --- */}
+      {/* --- NAVBAR --- */}
       <header className="fixed top-0 left-0 right-0 z-50 px-8 py-4 flex justify-between items-center bg-black/70 backdrop-blur-2xl border-b border-white/10 max-w-7xl mx-auto rounded-full mt-4 w-[90%] shadow-2xl">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_#22d3ee]" />
@@ -227,7 +227,7 @@ export default function App() {
       {/* --- HERO SECTION --- */}
       <div className="w-full min-h-screen flex flex-col justify-center items-center relative z-10 px-4 pt-28 text-center">
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-[11px] font-medium tracking-wider uppercase backdrop-blur-xl">
-          Zero-Trust Spatial Intelligence v3.4
+          Zero-Trust Spatial Intelligence v3.5
         </div>
         <h2 className="text-5xl md:text-8xl font-semibold tracking-tighter text-white mb-6 leading-none max-w-5xl">
           Secure enterprise, <br />
@@ -389,7 +389,7 @@ export default function App() {
           <div className="h-16"></div>
         </div>
 
-        {/* RIGHT COLUMN: Enhanced 3D Spatial Visualizer */}
+        {/* RIGHT COLUMN: 3D Visualizer */}
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/10 bg-[#000000] z-0 overflow-hidden">
           <div className="absolute top-28 left-8 z-10 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/80 px-4 py-2 rounded-full border border-white/10 backdrop-blur-2xl flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
@@ -409,7 +409,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- EXTENDED KNOWLEDGE BASE & SECURITY FAQs --- */}
+      {/* --- FAQ SECTION --- */}
       <section className="py-24 px-8 max-w-5xl mx-auto w-full z-10 border-t border-white/10">
         <div className="text-center mb-16">
           <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Enterprise Compliance</span>
