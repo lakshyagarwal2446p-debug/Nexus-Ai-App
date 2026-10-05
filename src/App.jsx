@@ -12,7 +12,6 @@ function LayeredAgentCore({ activeService }) {
   useFrame((state, delta) => {
     if (!coreRef.current || !ring1Ref.current || !ring2Ref.current) return;
     
-    // Rotation speeds based on active service layer
     const speed = activeService === 'all' ? 1.0 : 2.5;
     coreRef.current.rotation.x += delta * speed * 0.5;
     coreRef.current.rotation.y += delta * speed * 0.8;
@@ -21,7 +20,6 @@ function LayeredAgentCore({ activeService }) {
     ring2Ref.current.rotation.x += delta * speed * 0.3;
   });
 
-  // Dynamic color coding per service layer
   const getThemeColor = () => {
     switch (activeService) {
       case 'market': return '#3b82f6';   // Deep Blue
@@ -109,7 +107,7 @@ export default function App() {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
+        model: "gemini-2.0-flash", // Updated to stable active model endpoint
         generationConfig: { responseMimeType: "application/json" }
       });
 
