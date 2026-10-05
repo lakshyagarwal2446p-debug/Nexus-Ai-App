@@ -25,11 +25,11 @@ function MultiLayeredCore({ phase, activeService }) {
 
   const getThemeColor = () => {
     switch (activeService) {
-      case 'market': return '#3b82f6';   // Blue
-      case 'strategy': return '#8b5cf6'; // Violet
-      case 'code': return '#10b981';     // Emerald
-      case 'pitch': return '#f59e0b';    // Amber
-      default: return '#6366f1';         // Indigo
+      case 'market': return '#3b82f6';
+      case 'strategy': return '#8b5cf6';
+      case 'code': return '#10b981';
+      case 'pitch': return '#f59e0b';
+      default: return '#6366f1';
     }
   };
 
@@ -38,7 +38,6 @@ function MultiLayeredCore({ phase, activeService }) {
   return (
     <group>
       <Float speed={2.5} rotationIntensity={1.2} floatIntensity={2}>
-        {/* Layer 1: Central AI Processing Core */}
         <mesh ref={coreRef}>
           <icosahedronGeometry args={[1.5, 0]} />
           <meshStandardMaterial 
@@ -51,20 +50,17 @@ function MultiLayeredCore({ phase, activeService }) {
           />
         </mesh>
 
-        {/* Layer 2: Inner Data Ring */}
         <mesh ref={ring1Ref}>
           <torusGeometry args={[2.4, 0.03, 16, 100]} />
           <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1} />
         </mesh>
 
-        {/* Layer 3: Outer Orbital Field */}
         <mesh ref={ring2Ref} rotation={[Math.PI / 4, 0, 0]}>
           <torusGeometry args={[3.3, 0.02, 16, 100]} />
           <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.5} transparent opacity={0.4} />
         </mesh>
       </Float>
 
-      {/* Floating Ambient Data Particles */}
       <group ref={particleFieldRef}>
         {Array.from({ length: 25 }).map((_, i) => (
           <mesh key={i} position={[
@@ -119,10 +115,10 @@ export default function App() {
     setError(null);
 
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      // Using gemini-pro for stable API routing
-      const model = genAI.getGenerativeModel({ 
-        model: "gemini-pro",
+      // Explicitly initialize GoogleGenerativeAI instance here
+      const ai = new GoogleGenerativeAI(apiKey);
+      const model = ai.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
         generationConfig: { responseMimeType: "application/json" }
       });
 
@@ -146,8 +142,8 @@ export default function App() {
       setTimeout(() => setAgentPhase('architecture'), 3600);
       setTimeout(() => setAgentPhase('roadmap'), 5400);
 
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      const response = await model.generateContent(prompt);
+      const responseText = response.response.text();
       
       const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsedData = JSON.parse(cleanedText);
@@ -348,19 +344,6 @@ export default function App() {
           
           <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent pointer-events-none opacity-80" />
         </div>
-      </div>
-
-      {/* --- ARCHITECTURE & PRICING SECTIONS --- */}
-      <div ref={architectureRef} className="w-full py-24 px-6 lg:px-16 bg-[#040817] border-t border-white/5 relative z-10">
-        <div className="max-w-6xl mx-auto text-center mb-16">
-          <h2 className="text-3xl font-extrabold text-white mb-3">Technical Specification</h2>
-          <p className="text-slate-400 text-sm">Decoupled full-stack architecture combining high-performance React spatial rendering with live Gemini intelligence.</p>
-        </div>
-      </div>
-
-      <div ref={pricingRef} className="w-full py-24 px-6 lg:px-16 bg-[#020617] border-t border-white/5 relative z-10 text-center">
-        <h2 className="text-3xl font-extrabold text-white mb-3">Commercial Access Plans</h2>
-        <p className="text-slate-400 text-sm mb-8">Deploy at scale with transparent developer and enterprise tiers.</p>
       </div>
 
     </div>
