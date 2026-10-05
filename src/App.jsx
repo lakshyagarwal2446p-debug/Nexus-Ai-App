@@ -35,23 +35,16 @@ function SpatialUniverse({ phase, activeService }) {
 
   return (
     <group>
-      <Float speed={2} rotationIntensity={1.2} floatIntensity={2}>
+      <Float floatIntensity="{2}" rotationIntensity="{1.2}" speed="{2}">
         {/* Central Distorted Core */}
         <mesh ref={coreRef}>
           <icosahedronGeometry args={[1.3, 0]} />
-          <MeshDistortMaterial 
-            color={color} 
-            speed={3} 
-            distort={0.4} 
-            roughness={0.1} 
-            metalness={0.9} 
-            wireframe={phase !== 'idle'} 
-          />
+          <MeshDistortMaterial !="=" 'idle'} color="{color}" distort="{0.4}" metalness="{0.9}" roughness="{0.1}" speed="{3}" wireframe="{phase"/>
         </mesh>
 
         {/* Orbiting Torus Knot */}
         <group ref={knotRef} scale={[0.8, 0.8, 0.8]}>
-          <TorusKnot args={[1.8, 0.05, 128, 32]}>
+          <TorusKnot 0.05, 128, 32]} args="{[1.8,">
             <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} />
           </TorusKnot>
         </group>
@@ -105,16 +98,15 @@ export default function App() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Interactive Deep-Dive Modals Content
   const handleOpenModal = (type) => {
     const modals = {
       specs: {
         title: "Spatial Neural Architecture Specs",
-        content: "Nexus AI utilizes a multi-layered asynchronous processing pipeline. Built on React 19, Vite, Three.js spatial shaders, and Google's Gemini 1.5 Flash model, it constructs deterministic business logic graphs in <4.2 seconds."
+        content: "Nexus AI utilizes a multi-layered asynchronous processing pipeline. Built on React, Vite, Three.js spatial shaders, and Google's Gemini 1.5 Flash model, it constructs deterministic business logic graphs in real-time."
       },
       telemetry: {
         title: "Live Telemetry & Latency Metrics",
-        content: "System load: Optimal (14ms latency). API handshake status: Secure (TLS 1.3). Distributed cluster node synchronization active across 4 edge regions."
+        content: "System load: Optimal (14ms latency). API handshake status: Secure (TLS 1.3). Distributed cluster node synchronization active across edge regions."
       },
       whitepaper: {
         title: "Executive Whitepaper: Autonomous Agents",
@@ -141,8 +133,7 @@ export default function App() {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        generationConfig: { responseMimeType: "application/json" }
+        model: "gemini-1.5-flash"
       });
 
       const prompt = `
@@ -152,7 +143,7 @@ export default function App() {
         Budget: ${formData.budget}
         Problem: ${formData.problem}
 
-        Respond ONLY with a valid JSON object matching this exact structure:
+        You MUST respond with a valid JSON object ONLY. Do not include markdown code blocks like \`\`\`json. Match this exact structure:
         {
           "market": "Comprehensive TAM/SAM/SOM global telemetry, structural demographic friction, and macro competitive moats.",
           "strategy": "Ecosystem monetization blueprint, tiered B2B pricing architecture, and high-retention enterprise GTM strategy.",
@@ -166,7 +157,11 @@ export default function App() {
       setTimeout(() => setAgentPhase('roadmap'), 4800);
 
       const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      let responseText = result.response.text();
+
+      // Robustly clean any markdown code blocks returned by the model
+      responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
       const parsedData = JSON.parse(responseText);
 
       setResults(parsedData);
@@ -174,8 +169,8 @@ export default function App() {
       setProgressLog(prev => [...prev, '[SUCCESS] Spatial architecture fully synthesized.']);
 
     } catch (err) {
-      console.error(err);
-      setError("Execution interrupted. Check API key permissions.");
+      console.error("API Error Details:", err);
+      setError(`Execution error: ${err.message || "Unknown error occurred"}`);
       setAgentPhase('idle');
     }
   };
@@ -183,7 +178,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#000000] text-slate-100 font-sans flex flex-col overflow-x-hidden selection:bg-cyan-500/30">
       
-      {/* --- APPLE-GRADE NAVBAR --- */}
+      {/* --- NAVBAR --- */}
       <header className="fixed top-0 left-0 right-0 z-50 px-8 py-4 flex justify-between items-center bg-black/70 backdrop-blur-2xl border-b border-white/10 max-w-7xl mx-auto rounded-full mt-4 w-[90%] shadow-2xl">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_12px_#22d3ee]" />
@@ -216,7 +211,6 @@ export default function App() {
           Nexus AI operates as a sovereign autonomous architect—synthesizing market macro-dynamics, monetization schemas, and enterprise infrastructure in real-time.
         </p>
 
-        {/* Hero Interactive Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-16">
           <button onClick={() => scrollToWorkspace('market')} className="px-8 py-4 rounded-full bg-cyan-500 text-black font-bold text-sm hover:bg-cyan-400 transition shadow-lg shadow-cyan-500/20">
             Launch Workspace →
@@ -228,44 +222,32 @@ export default function App() {
 
         {/* --- SERVICE PILLARS --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl text-left mb-12">
-          
           <div onClick={() => scrollToWorkspace('market')} className="group bg-[#0a0a0c] border border-white/10 hover:border-cyan-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
             <span className="text-xs font-mono text-cyan-400 mb-4 block">01 / MARKET</span>
             <h3 className="font-semibold text-white mb-2 text-base">Global Telemetry</h3>
             <p className="text-xs text-slate-400 font-light leading-relaxed">Automated TAM/SAM calculations and structural friction analysis.</p>
           </div>
-
           <div onClick={() => scrollToWorkspace('strategy')} className="group bg-[#0a0a0c] border border-white/10 hover:border-purple-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
             <span className="text-xs font-mono text-purple-400 mb-4 block">02 / STRATEGY</span>
             <h3 className="font-semibold text-white mb-2 text-base">Ecosystem Design</h3>
             <p className="text-xs text-slate-400 font-light leading-relaxed">Tiered subscription engineering and high-retention GTM models.</p>
           </div>
-
           <div onClick={() => scrollToWorkspace('code')} className="group bg-[#0a0a0c] border border-white/10 hover:border-emerald-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
             <span className="text-xs font-mono text-emerald-400 mb-4 block">03 / CODE</span>
             <h3 className="font-semibold text-white mb-2 text-base">Core Infrastructure</h3>
             <p className="text-xs text-slate-400 font-light leading-relaxed">Production-grade asynchronous API codebases ready for deployment.</p>
           </div>
-
           <div onClick={() => scrollToWorkspace('pitch')} className="group bg-[#0a0a0c] border border-white/10 hover:border-amber-500/50 p-6 rounded-3xl cursor-pointer transition-all backdrop-blur-xl shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
             <span className="text-xs font-mono text-amber-400 mb-4 block">04 / PITCH</span>
             <h3 className="font-semibold text-white mb-2 text-base">Investor Deck</h3>
             <p className="text-xs text-slate-400 font-light leading-relaxed">Visionary Y-Combinator narrative structures for institutional round raises.</p>
           </div>
-
         </div>
       </div>
 
       {/* --- WORKSPACE SPLIT VIEW --- */}
       <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative min-h-screen">
-        
-        {/* LEFT COLUMN: Workspace Form & Output */}
         <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-16 gap-8 justify-center">
-          
           <div className="bg-[#0a0a0c] border border-white/10 rounded-[32px] p-8 lg:p-10 shadow-2xl backdrop-blur-2xl">
             <h3 className="text-xs font-mono uppercase tracking-widest text-slate-400 mb-8 flex items-center gap-3">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
@@ -273,7 +255,7 @@ export default function App() {
             </h3>
             
             {error && (
-              <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">
+              <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono break-words">
                 {error}
               </div>
             )}
@@ -328,7 +310,6 @@ export default function App() {
             </button>
           </div>
 
-          {/* Results Output Console */}
           {results && (
             <div className="bg-[#0a0a0c] border border-white/10 rounded-[32px] p-8 lg:p-10 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
               <div className="flex justify-between items-center border-b border-white/10 pb-5 mb-6">
@@ -377,7 +358,7 @@ export default function App() {
           <div className="h-16"></div>
         </div>
 
-        {/* RIGHT COLUMN: Spatial 3D Visualizer */}
+        {/* RIGHT COLUMN: 3D Visualizer */}
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/10 bg-[#000000] z-0 overflow-hidden">
           <div className="absolute top-28 left-8 z-10 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/80 px-4 py-2 rounded-full border border-white/10 backdrop-blur-2xl flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
@@ -397,7 +378,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* --- EXTENDED INFORMATION SECTION: ENTERPRISE FAQ & SPECS --- */}
+      {/* --- FAQ SECTION --- */}
       <section className="py-24 px-8 max-w-5xl mx-auto w-full z-10 border-t border-white/10">
         <div className="text-center mb-16">
           <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Knowledge Base</span>
@@ -428,7 +409,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* --- MODAL OVERLAY (FOR WORKING BUTTONS) --- */}
+      {/* --- MODAL OVERLAY --- */}
       {modalData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="bg-[#0a0a0c] border border-white/20 rounded-[32px] p-8 max-w-lg w-full relative shadow-2xl">
@@ -444,7 +425,6 @@ export default function App() {
         </div>
       )}
 
-      {/* --- FOOTER --- */}
       <footer className="py-12 border-t border-white/10 text-center text-xs text-slate-500 font-mono z-10">
         <p>Nexus AI Enterprise © 2026 • Sovereign Autonomous Architect</p>
       </footer>
