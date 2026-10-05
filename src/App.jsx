@@ -119,11 +119,10 @@ export default function App() {
     setError(null);
 
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        generationConfig: { responseMimeType: "application/json" }
-      });
+  model: "gemini-pro",
+  generationConfig: { responseMimeType: "application/json" }
+});
 
       const prompt = `
         You are Nexus AI, an elite enterprise autonomous startup architect. 
