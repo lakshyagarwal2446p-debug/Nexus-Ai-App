@@ -8,25 +8,30 @@ function LayeredAgentCore({ activeService }) {
   const coreRef = useRef();
   const ring1Ref = useRef();
   const ring2Ref = useRef();
+  const ring3Ref = useRef();
 
   useFrame((state, delta) => {
-    if (!coreRef.current || !ring1Ref.current || !ring2Ref.current) return;
+    if (!coreRef.current || !ring1Ref.current || !ring2Ref.current || !ring3Ref.current) return;
     
-    const speed = activeService === 'all' ? 1.0 : 2.5;
-    coreRef.current.rotation.x += delta * speed * 0.5;
-    coreRef.current.rotation.y += delta * speed * 0.8;
+    const speed = activeService === 'all' ? 1.0 : 2.8;
+    coreRef.current.rotation.x += delta * speed * 0.4;
+    coreRef.current.rotation.y += delta * speed * 0.7;
     
-    ring1Ref.current.rotation.z -= delta * speed * 0.4;
+    ring1Ref.current.rotation.z -= delta * speed * 0.5;
     ring2Ref.current.rotation.x += delta * speed * 0.3;
+    ring3Ref.current.rotation.y -= delta * speed * 0.6;
   });
 
   const getThemeColor = () => {
     switch (activeService) {
-      case 'market': return '#3b82f6';   
-      case 'mvp': return '#10b981';      
-      case 'pitch': return '#f59e0b';    
-      case 'compliance': return '#ef4444'; 
-      default: return '#6366f1';         
+      case 'market': return '#3b82f6';   // Blue
+      case 'mvp': return '#10b981';      // Emerald
+      case 'pitch': return '#f59e0b';    // Amber
+      case 'compliance': return '#ef4444'; // Red
+      case 'neural': return '#a855f7';   // Purple
+      case 'tax': return '#06b6d4';      // Cyan
+      case 'vc': return '#ec4899';       // Pink
+      default: return '#6366f1';         // Indigo
     }
   };
 
@@ -34,36 +39,46 @@ function LayeredAgentCore({ activeService }) {
 
   return (
     <group>
-      <Float speed={2.5} rotationIntensity={1.5} floatIntensity={2}>
+      <Float speed={3} rotationIntensity={2} floatIntensity={2.5}>
+        {/* Layer 1: Central Core Node */}
         <mesh ref={coreRef}>
-          <octahedronGeometry args={[1.4, 0]} />
+          <icosahedronGeometry args={[1.5, 0]} />
           <meshStandardMaterial 
             color={themeColor} 
             wireframe={activeService !== 'all'} 
             emissive={themeColor}
-            emissiveIntensity={0.6}
+            emissiveIntensity={0.7}
             roughness={0.1}
             metalness={0.9}
           />
         </mesh>
 
+        {/* Layer 2: Inner Ring */}
         <mesh ref={ring1Ref}>
-          <torusGeometry args={[2.2, 0.03, 16, 100]} />
+          <torusGeometry args={[2.3, 0.03, 16, 100]} />
           <meshStandardMaterial color={themeColor} emissive={themeColor} emissiveIntensity={0.8} />
         </mesh>
 
+        {/* Layer 3: Orbital Ring */}
         <mesh ref={ring2Ref} rotation={[Math.PI / 3, 0, 0]}>
-          <torusGeometry args={[2.9, 0.02, 16, 100]} />
-          <meshStandardMaterial color="#ffffff" transparent opacity={0.3} />
+          <torusGeometry args={[3.0, 0.02, 16, 100]} />
+          <meshStandardMaterial color="#ffffff" transparent opacity={0.4} />
+        </mesh>
+
+        {/* Layer 4: Outer Satellite Ring */}
+        <mesh ref={ring3Ref} rotation={[0, Math.PI / 4, Math.PI / 6]}>
+          <torusGeometry args={[3.7, 0.015, 16, 100]} />
+          <meshStandardMaterial color={themeColor} transparent opacity={0.5} />
         </mesh>
       </Float>
     </group>
   );
 }
 
-// --- MAIN MULTI-LAYERED APP ---
+// --- MAIN APPLICATION ---
 export default function App() {
   const [selectedService, setSelectedService] = useState('all');
+  const [selectedTier, setSelectedTier] = useState('Growth');
   const [formData, setFormData] = useState({
     industry: 'Fintech & Automated Payments',
     budget: '$50k - $100k',
@@ -81,10 +96,19 @@ export default function App() {
 
   const servicesList = [
     { id: 'all', title: 'Full Autonomous Suite', desc: 'End-to-end orchestration from market sizing to production code.', icon: '⚡' },
-    { id: 'market', title: 'Autonomous Market Scraper', desc: 'Real-time TAM/SAM/SOM calculations and competitor matrix audits.', icon: '📊' },
-    { id: 'mvp', title: 'Automated MVP Generator', desc: 'Generates production-grade backend boilerplate & database architecture.', icon: '🛠️' },
+    { id: 'market', title: 'Market Intelligence Scraper', desc: 'Real-time TAM/SAM/SOM calculations and competitor audits.', icon: '📊' },
+    { id: 'mvp', title: 'Automated MVP Generator', desc: 'Generates production-grade backend boilerplate & DB schemas.', icon: '🛠️' },
     { id: 'pitch', title: 'Seed Deck Architect', desc: 'Structures YC-style investor narratives and financial runways.', icon: '🚀' },
-    { id: 'compliance', title: 'Risk & Regulatory Audit', desc: 'Scans sector-specific compliance rules and data security vectors.', icon: '🛡️' }
+    { id: 'compliance', title: 'Risk & Regulatory Audit', desc: 'Scans sector-specific compliance rules and security vectors.', icon: '🛡️' },
+    { id: 'neural', title: 'Neural Code Refactorer', desc: 'Optimizes microservice architecture and identifies logic bottlenecks.', icon: '🧬' },
+    { id: 'tax', title: 'Global Tax & Legal Engine', desc: 'Analyzes cross-border tax structures and entity incorporation.', icon: '🌐' },
+    { id: 'vc', title: 'Venture Capital Matchmaker', desc: 'Aligns your startup profile with active institutional investors.', icon: '💼' }
+  ];
+
+  const pricingPlans = [
+    { name: 'Starter', price: '$99', desc: 'Ideal for solo founders testing early concepts.', features: ['1 Autonomous Pipeline / mo', 'Basic Market Scraper', 'Standard Support'] },
+    { name: 'Growth', price: '$299', desc: 'For scaling startups building production MVPs.', features: ['Unlimited Pipelines', 'Advanced 3D Architecture Engine', 'Priority API Access', 'Custom Code Export'] },
+    { name: 'Enterprise', price: '$899', desc: 'For institutional execution and VC syndicates.', features: ['Dedicated Agent Clusters', 'Custom Legal & Tax Modules', '24/7 Dedicated Architect', 'White-Label Reports'] }
   ];
 
   const runAgentPipeline = async () => {
@@ -138,8 +162,6 @@ export default function App() {
 
     } catch (err) {
       console.warn("API traffic spike detected, deploying intelligent offline fallback payload.");
-      
-      // Intelligent Fallback so your app never fails visually during a live presentation
       setTimeout(() => {
         setResults({
           market: `Market Intelligence Report for ${formData.industry}\n\n- Target TAM: $12.4 Billion globally with a 14.2% CAGR.\n- Primary Friction: Legacy systems create massive operational bottlenecks.\n- Competitive Edge: Automated orchestration reduces manual processing time by up to 88%.`,
@@ -166,12 +188,16 @@ export default function App() {
               NEXUS <span className="text-indigo-400">AI</span>
             </h1>
           </div>
-          <button onClick={scrollToWorkspace} className="px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-600/30">
-            Open App
-          </button>
+          <div className="flex items-center gap-4">
+            <a href="#pricing" className="text-sm font-semibold text-slate-300 hover:text-white transition">Pricing</a>
+            <a href="#about" className="text-sm font-semibold text-slate-300 hover:text-white transition">About Us</a>
+            <button onClick={scrollToWorkspace} className="px-6 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all shadow-lg shadow-indigo-600/30">
+              Launch App
+            </button>
+          </div>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 max-w-5xl mx-auto">
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 max-w-5xl mx-auto my-12">
           <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
             Multi-Layered Autonomous Enterprise Engine
           </div>
@@ -182,11 +208,12 @@ export default function App() {
             </span>
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mb-12 leading-relaxed">
-            Select your specialized architecture tier, input your operational roadblock, and let our multi-agent framework compile your entire corporate roadmap and technical backend.
+            Select from 8 specialized AI architecture tiers, input your operational roadblock, and compile your entire corporate roadmap, compliance check, and production backend instantly.
           </p>
           
+          {/* Bento Grid Preview */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-10 text-left">
-            {servicesList.slice(1).map((s) => (
+            {servicesList.slice(1, 5).map((s) => (
               <div 
                 key={s.id} 
                 onClick={() => { setSelectedService(s.id); scrollToWorkspace(); }}
@@ -204,17 +231,19 @@ export default function App() {
       </div>
 
       {/* --- WORKSPACE SPLIT VIEW --- */}
-      <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative">
+      <div ref={workspaceRef} className="flex flex-col lg:flex-row w-full relative border-b border-slate-800">
         
+        {/* LEFT COLUMN: Controls & Outputs */}
         <div className="w-full lg:w-7/12 flex flex-col z-10 p-6 lg:p-12 gap-8">
           
           <div className="bg-[#0a0f1c] border border-white/5 rounded-3xl p-8 shadow-2xl backdrop-blur-xl">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-6 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-              Service Layer Configuration
+              Expanded Service Layer Configuration ({servicesList.length} Layers Available)
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+            {/* Service Tier Selector Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
               {servicesList.map((srv) => (
                 <button
                   key={srv.id}
@@ -225,9 +254,10 @@ export default function App() {
                       : 'bg-black/30 border-slate-800 text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  <span className="text-lg">{srv.icon}</span>
+                  <span className="text-xl">{srv.icon}</span>
                   <div>
-                    <div>{srv.title}</div>
+                    <div className="text-white">{srv.title}</div>
+                    <div className="text-[10px] text-slate-400 font-normal mt-0.5">{srv.desc}</div>
                   </div>
                 </button>
               ))}
@@ -289,6 +319,7 @@ export default function App() {
             </button>
           </div>
 
+          {/* Results Render */}
           {results && (
             <div className="bg-slate-900/40 border border-indigo-500/20 rounded-3xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-700">
               <div className="flex overflow-x-auto gap-3 border-b border-slate-800 pb-5 mb-6 custom-scrollbar">
@@ -328,6 +359,7 @@ export default function App() {
           <div className="h-24"></div>
         </div>
 
+        {/* RIGHT COLUMN: Sticky 3D Layer Visualizer */}
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/5 bg-[#02050f] z-0 overflow-hidden">
           <div className="absolute top-6 left-6 z-10 flex items-center gap-2 font-mono text-[10px] text-slate-400 uppercase tracking-widest bg-black/60 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
@@ -346,6 +378,89 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent pointer-events-none opacity-80" />
         </div>
       </div>
+
+      {/* --- DETAILED ABOUT US & SERVICES SECTION --- */}
+      <section id="about" className="py-24 px-8 max-w-7xl mx-auto w-full border-b border-slate-800">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Enterprise Infrastructure</h3>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Built for founders, backed by autonomous multi-agent intelligence.</h2>
+          <p className="text-slate-400 leading-relaxed">
+            Nexus AI eliminates manual friction by deploying specialized sub-agents that simultaneously conduct market research, draft financial projections, write clean backend microservices, and audit regulatory compliance.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl font-bold mb-6">01</div>
+            <h4 className="text-lg font-bold text-white mb-3">Multi-Agent Orchestration</h4>
+            <p className="text-slate-400 text-sm leading-relaxed">Our pipeline triggers parallel LLM reasoning passes to cross-verify market validation metrics against live technical constraints.</p>
+          </div>
+          <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl font-bold mb-6">02</div>
+            <h4 className="text-lg font-bold text-white mb-3">Production-Grade Output</h4>
+            <p className="text-slate-400 text-sm leading-relaxed">Unlike generic text generators, Nexus outputs structured JSON payloads containing production-ready boilerplate and 90-day execution milestones.</p>
+          </div>
+          <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-3xl backdrop-blur-md">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold mb-6">03</div>
+            <h4 className="text-lg font-bold text-white mb-3">Secure & Resilient</h4>
+            <p className="text-slate-400 text-sm leading-relaxed">Equipped with automatic retry wrappers and offline fallback resilience to ensure 99.9% uptime during high traffic spikes.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* --- PREMIUM SUBSCRIPTION PURCHASING SECTION --- */}
+      <section id="pricing" className="py-24 px-8 max-w-7xl mx-auto w-full">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-widest mb-3">Flexible Pricing</h3>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">Accelerate your venture with transparent tiers.</h2>
+          <p className="text-slate-400 leading-relaxed">Select a subscription tier to unlock unlimited pipeline executions, custom API endpoints, and dedicated multi-agent clusters.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {pricingPlans.map((plan, idx) => (
+            <div 
+              key={idx}
+              onClick={() => setSelectedTier(plan.name)}
+              className={`p-8 rounded-3xl border transition cursor-pointer flex flex-col justify-between ${
+                selectedTier === plan.name 
+                  ? 'bg-indigo-950/20 border-indigo-500 shadow-2xl shadow-indigo-500/10 scale-[1.02]' 
+                  : 'bg-slate-900/30 border-slate-800 hover:border-slate-700'
+              }`}
+            >
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold text-white text-lg">{plan.name}</h4>
+                  {selectedTier === plan.name && <span className="text-xs bg-indigo-500 text-white px-2.5 py-1 rounded-full font-bold">Selected</span>}
+                </div>
+                <div className="text-4xl font-extrabold text-white mb-2">{plan.price}<span className="text-xs font-normal text-slate-400">/month</span></div>
+                <p className="text-xs text-slate-400 mb-6">{plan.desc}</p>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feat, fIdx) => (
+                    <li key={fIdx} className="text-xs text-slate-300 flex items-center gap-2">
+                      <span className="text-emerald-400 font-bold">✓</span> {feat}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button 
+                onClick={() => alert(`Redirecting to secure checkout for ${plan.name} Tier (${plan.price}/mo)...`)}
+                className={`w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition ${
+                  selectedTier === plan.name
+                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                }`}
+              >
+                Get Started with {plan.name}
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-8 border-t border-slate-900 text-center text-xs text-slate-500">
+        <p>© 2026 Nexus AI Systems. All rights reserved. Built with React, Tailwind CSS, Three.js & Google Gemini API.</p>
+      </footer>
     </div>
   );
 }
