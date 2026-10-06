@@ -4,15 +4,12 @@ import { OrbitControls, Stars, Float, Points, PointMaterial } from '@react-three
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as random from 'maath/random/dist/maath-random.esm';
 
-// --- 1. FIREBASE SETUP (REPLACE WITH YOUR KEYS) ---
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// --- 1. FIREBASE SETUP (USING YOUR CONFIG) ---
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAgYp7SHUlFb2kLOh67rFMkVCWXx0-mU7M",
   authDomain: "nexus-ai-app-ffdc6.firebaseapp.com",
@@ -25,17 +22,16 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+// Optional analytics initialization (safe for browser environments)
+if (typeof window !== 'undefined') {
+  try { getAnalytics(app); } catch (e) { console.warn("Analytics not supported in this environment"); }
+}
 
-// --- 2. NEW 3D ANIMATION: DIGITAL PARTICLE MATRIX (LANDING PAGE) ---
+// --- 2. 3D DIGITAL PARTICLE MATRIX (LANDING PAGE) ---
 function CyberParticleMatrix(props) {
   const ref = useRef();
-  // Generate random points in a sphere for a futuristic "data cloud" look
   const [sphere] = useState(() => random.inSphere(new Float32Array(5000 * 3), { radius: 3 }));
 
   useFrame((state, delta) => {
@@ -52,7 +48,7 @@ function CyberParticleMatrix(props) {
   );
 }
 
-// --- 3. EXISTING 3D ANIMATION: ENTERPRISE CORE (APP WORKSPACE) ---
+// --- 3. 3D ENTERPRISE CORE (APP WORKSPACE) ---
 function EnterpriseSpatialCore({ activeService }) {
   const coreRef = useRef();
   const ring1Ref = useRef();
@@ -81,20 +77,17 @@ function EnterpriseSpatialCore({ activeService }) {
   );
 }
 
-// --- 4. MAIN APPLICATION ROUTER & STATE ---
+// --- 4. MAIN APPLICATION ---
 export default function App() {
-  // Navigation State
-  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'auth', 'workspace'
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+  const [currentView, setCurrentView] = useState('landing');
+  const [authMode, setAuthMode] = useState('login');
   const [user, setUser] = useState(null);
 
-  // Auth Form State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  // App Workspace State
   const [selectedService, setSelectedService] = useState('all');
   const [formData, setFormData] = useState({ industry: '', budget: '$50k - $100k', problem: '' });
   const [agentPhase, setAgentPhase] = useState('idle');
@@ -102,7 +95,6 @@ export default function App() {
   const [results, setResults] = useState(null);
   const [appError, setAppError] = useState(null);
 
-  // Listen for Firebase Login state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -113,7 +105,6 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // --- AUTHENTICATION HANDLERS ---
   const handleAuth = async (e) => {
     e.preventDefault();
     setIsAuthenticating(true);
@@ -122,7 +113,6 @@ export default function App() {
     try {
       if (authMode === 'signup') {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        // Save user to Firestore Database tracking
         await setDoc(doc(db, "users", userCredential.user.uid), {
           email: email,
           createdAt: new Date().toISOString(),
@@ -145,7 +135,6 @@ export default function App() {
     setResults(null);
   };
 
-  // --- BUG FIX: RESET PIPELINE STATE FOR MULTIPLE GENERATIONS ---
   const resetPipeline = () => {
     setResults(null);
     setAgentPhase('idle');
@@ -153,7 +142,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- AI PIPELINE GENERATION ---
   const runAgentPipeline = async () => {
     if (!formData.problem.trim() || agentPhase !== 'idle') return;
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -175,9 +163,8 @@ export default function App() {
       const parsedData = JSON.parse(result.response.text());
 
       setResults(parsedData);
-      setAgentPhase('complete'); // Changed from idle to complete to lock button until reset
+      setAgentPhase('complete');
     } catch (err) {
-      // Fallback
       setTimeout(() => {
         setResults({
           market: `Market Intelligence Report generated. Target TAM identified.`,
@@ -190,13 +177,9 @@ export default function App() {
     }
   };
 
-  // ==========================================
-  // VIEW 1: LANDING PAGE
-  // ==========================================
   if (currentView === 'landing') {
     return (
       <div className="min-h-screen bg-[#020617] flex flex-col relative overflow-hidden font-sans">
-        {/* Background 3D Matrix */}
         <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 4] }}>
             <ambientLight intensity={0.5} />
@@ -206,7 +189,6 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-[#020617] pointer-events-none" />
         </div>
 
-        {/* Content */}
         <header className="px-8 py-6 flex justify-between items-center z-10 relative">
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 rounded-full bg-indigo-500 animate-pulse shadow-lg shadow-indigo-500/50" />
@@ -235,9 +217,6 @@ export default function App() {
     );
   }
 
-  // ==========================================
-  // VIEW 2: AUTHENTICATION PAGE
-  // ==========================================
   if (currentView === 'auth') {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative font-sans">
@@ -279,9 +258,6 @@ export default function App() {
     );
   }
 
-  // ==========================================
-  // VIEW 3: MAIN APP WORKSPACE
-  // ==========================================
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 font-sans flex flex-col overflow-x-hidden selection:bg-indigo-500/30">
       
@@ -325,7 +301,6 @@ export default function App() {
               <textarea rows={4} value={formData.problem} onChange={(e) => setFormData({...formData, problem: e.target.value})} disabled={agentPhase !== 'idle'} className="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-sm text-white resize-y" />
             </div>
 
-            {/* BUG FIX: Toggling between Generate and Reset */}
             {agentPhase === 'complete' ? (
               <button onClick={resetPipeline} className="w-full mt-8 py-5 rounded-xl font-extrabold tracking-widest uppercase transition-all shadow-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/25">
                 Run Another Analysis ↺
@@ -337,7 +312,6 @@ export default function App() {
             )}
           </div>
 
-          {/* Results Output */}
           {results && (
             <div className="bg-slate-900/40 border border-indigo-500/20 rounded-3xl p-8 shadow-2xl animate-in fade-in">
               <div className="flex overflow-x-auto gap-3 border-b border-slate-800 pb-5 mb-6 custom-scrollbar">
@@ -355,7 +329,6 @@ export default function App() {
           <div className="h-24"></div>
         </div>
 
-        {/* Right 3D Visualizer */}
         <div className="hidden lg:block lg:w-5/12 h-screen sticky top-0 border-l border-white/5 bg-[#02050f] z-0 overflow-hidden">
           <Canvas camera={{ position: [0, 0, 8] }}>
             <ambientLight intensity={0.6} />
