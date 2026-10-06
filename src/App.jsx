@@ -5,18 +5,27 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as random from 'maath/random/dist/maath-random.esm';
 
 // --- 1. FIREBASE SETUP (REPLACE WITH YOUR KEYS) ---
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAgYp7SHUlFb2kLOh67rFMkVCWXx0-mU7M",
+  authDomain: "nexus-ai-app-ffdc6.firebaseapp.com",
+  projectId: "nexus-ai-app-ffdc6",
+  storageBucket: "nexus-ai-app-ffdc6.firebasestorage.app",
+  messagingSenderId: "146044567063",
+  appId: "1:146044567063:web:29257fa95abc7b9423e652",
+  measurementId: "G-6C0XCFC8B3"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
