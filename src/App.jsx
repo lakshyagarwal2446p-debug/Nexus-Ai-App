@@ -27,7 +27,7 @@ if (typeof window !== 'undefined') {
   try { getAnalytics(app); } catch (e) { console.warn("Analytics optional"); }
 }
 
-// --- 2. NEW 3D ANIMATION: ENCRYPTED SECURITY VAULT (AUTH PAGE) ---
+// --- 2. 3D ANIMATION: ENCRYPTED SECURITY VAULT (AUTH PAGE) ---
 function SecurityVaultCore() {
   const outerRef = useRef();
   const innerRef = useRef();
@@ -43,12 +43,10 @@ function SecurityVaultCore() {
   return (
     <group>
       <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5}>
-        {/* Outer Wireframe Shield */}
         <mesh ref={outerRef}>
           <icosahedronGeometry args={[3, 1]} />
           <meshStandardMaterial color="#4f46e5" wireframe={true} transparent opacity={0.15} />
         </mesh>
-        {/* Inner Encrypted Core */}
         <mesh ref={innerRef}>
           <octahedronGeometry args={[1.5, 0]} />
           <meshStandardMaterial color="#06b6d4" emissive="#06b6d4" emissiveIntensity={0.5} wireframe={true} transparent opacity={0.6} />
@@ -58,7 +56,7 @@ function SecurityVaultCore() {
   );
 }
 
-// --- 3. UPGRADED 3D ANIMATION: CYBER PARTICLE CLOUD + SPARKLES (LANDING) ---
+// --- 3. 3D ANIMATION: CYBER PARTICLE CLOUD + SPARKLES (LANDING) ---
 function CyberParticleMatrix(props) {
   const ref = useRef();
   const [sphere] = useState(() => random.inSphere(new Float32Array(6000 * 3), { radius: 4.5 }));
@@ -73,7 +71,6 @@ function CyberParticleMatrix(props) {
       <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
         <PointMaterial transparent color="#6366f1" size={0.015} sizeAttenuation={true} depthWrite={false} />
       </Points>
-      {/* Added Holographic Data Dust */}
       <Sparkles count={500} scale={10} size={2} speed={0.4} opacity={0.5} color="#38bdf8" />
     </group>
   );
@@ -91,7 +88,6 @@ function EnterpriseSpatialCore({ activeService }) {
     const speed = activeService === 'all' ? 0.8 : 2.5;
     coreRef.current.rotation.x += delta * speed * 0.3;
     coreRef.current.rotation.y += delta * speed * 0.5;
-    
     ring1Ref.current.rotation.z -= delta * speed * 0.4;
     ring2Ref.current.rotation.x += delta * speed * 0.5;
     ring3Ref.current.rotation.y -= delta * speed * 0.3;
@@ -160,8 +156,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('market');
   const [results, setResults] = useState(null);
   const [appError, setAppError] = useState(null);
-  
-  const workspaceRef = useRef(null);
 
   const servicesList = [
     { id: 'all', title: 'Full Autonomous Suite', desc: 'End-to-end orchestration from market sizing to production code.', icon: '⚡' },
@@ -241,10 +235,11 @@ export default function App() {
     }, 2000);
   };
 
+  // --- BUG FIX 1: Allow users to hit Execute again without re-typing their inputs ---
   const resetPipeline = () => {
     setResults(null);
     setAgentPhase('idle');
-    setFormData({ industry: '', budget: '$50k - $100k', problem: '' });
+    // Notice we are NOT clearing formData. This lets users tweak and re-run instantly!
   };
 
   const runAgentPipeline = async () => {
@@ -255,6 +250,10 @@ export default function App() {
     setAgentPhase('research');
     setResults(null);
     setAppError(null);
+
+    // BUG FIX 2: Store timeouts so we can cancel them if the API finishes super fast
+    const t1 = setTimeout(() => setAgentPhase(prev => prev !== 'complete' ? 'design' : prev), 1800);
+    const t2 = setTimeout(() => setAgentPhase(prev => prev !== 'complete' ? 'architecture' : prev), 3600);
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -276,17 +275,21 @@ export default function App() {
           "roadmap": "Write a highly detailed, week-by-week 90-day execution roadmap divided into Month 1 (Architecture), Month 2 (Beta Testing), and Month 3 (Scaling)." 
         }
       `;
-
-      setTimeout(() => setAgentPhase('design'), 1800);
-      setTimeout(() => setAgentPhase('architecture'), 3600);
       
       const result = await model.generateContent(prompt);
       const parsedData = JSON.parse(result.response.text());
 
+      // Safely kill loading animations & render results
+      clearTimeout(t1);
+      clearTimeout(t2);
       setResults(parsedData);
       setAgentPhase('complete');
+      
     } catch (err) {
       console.warn("API Error or Traffic Spike. Deploying High-Fidelity Fallback.");
+      clearTimeout(t1);
+      clearTimeout(t2);
+      
       setTimeout(() => {
         setResults({
           market: `### Comprehensive Market Intelligence Report: ${formData.industry}\n\n**1. Market Sizing (TAM/SAM/SOM)**\n- **Total Addressable Market (TAM):** Estimated at $24.8 Billion globally, growing at a 14.2% CAGR over the next 5 years.\n- **Serviceable Available Market (SAM):** $5.2 Billion focusing on mid-market to enterprise sectors.\n- **Serviceable Obtainable Market (SOM):** $150 Million within the first 24 months of GTM execution.\n\n**2. Core Friction Points & Competitor Matrix**\n- Legacy providers rely on fragmented, on-premise solutions causing 30% operational drag.\n- Competitors lack real-time API integrations, causing massive data silos.\n- Rigid enterprise pricing structures alienate bootstrapping founders and mid-level teams.\n\n**3. Target Psychographics**\nDecision-makers are typically VP of Operations or CTOs looking for low-latency, highly compliant SaaS solutions that integrate seamlessly into existing CI/CD pipelines.`,
@@ -485,7 +488,7 @@ export default function App() {
       <div className="min-h-screen bg-[#020617] flex items-center justify-center p-6 relative font-sans">
         
         {/* New Security Vault Background */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 opacity-80">
           <Canvas camera={{ position: [0, 0, 8] }}>
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1.5} color="#4f46e5" />
@@ -587,7 +590,7 @@ export default function App() {
               <textarea rows={4} value={formData.problem} onChange={(e) => setFormData({...formData, problem: e.target.value})} disabled={agentPhase !== 'idle'} className="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-sm text-white resize-y" />
             </div>
 
-            {agentPhase === 'complete' ? (
+            {results || agentPhase === 'complete' ? (
               <button onClick={resetPipeline} className="w-full mt-8 py-5 rounded-xl font-extrabold tracking-widest uppercase transition-all shadow-xl bg-emerald-600 hover:bg-emerald-500 text-white">
                 Run Another Analysis ↺
               </button>
